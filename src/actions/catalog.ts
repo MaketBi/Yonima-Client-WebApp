@@ -1,7 +1,7 @@
 'use server';
 
 import { createServerClient } from '@/lib/supabase/server';
-import type { Vendor, Product, Category, Pack, VendorType } from '@/types/models';
+import type { Vendor, Product, Category, VendorCategory, Pack, VendorType } from '@/types/models';
 
 /**
  * Get vendors by type with optional filters
@@ -362,9 +362,9 @@ export async function getGroceryVendor(): Promise<Vendor | null> {
 }
 
 /**
- * Get grocery categories (for epicerie page)
+ * Get grocery categories (for epicerie page) from vendor_categories table
  */
-export async function getGroceryCategories(): Promise<{ categories: Category[]; vendorId: string | null }> {
+export async function getGroceryCategories(): Promise<{ categories: VendorCategory[]; vendorId: string | null }> {
   try {
     const supabase = await createServerClient();
 
@@ -382,10 +382,11 @@ export async function getGroceryCategories(): Promise<{ categories: Category[]; 
     }
 
     const { data, error } = await supabase
-      .from('categories')
+      .from('vendor_categories')
       .select('*')
       .eq('vendor_id', vendor.id)
       .eq('is_active', true)
+      .order('sort_order', { ascending: true })
       .order('name', { ascending: true });
 
     if (error) {
@@ -393,7 +394,7 @@ export async function getGroceryCategories(): Promise<{ categories: Category[]; 
       return { categories: [], vendorId: vendor.id };
     }
 
-    return { categories: data as Category[], vendorId: vendor.id };
+    return { categories: data as VendorCategory[], vendorId: vendor.id };
   } catch (error) {
     console.error('Error fetching grocery categories:', error);
     return { categories: [], vendorId: null };
@@ -401,7 +402,7 @@ export async function getGroceryCategories(): Promise<{ categories: Category[]; 
 }
 
 /**
- * Get products by grocery category ID
+ * Get products by vendor_category_id
  */
 export async function getGroceryProductsByCategory(
   categoryId: string,
@@ -413,7 +414,7 @@ export async function getGroceryProductsByCategory(
     let query = supabase
       .from('products')
       .select('*')
-      .eq('category_id', categoryId)
+      .eq('vendor_category_id', categoryId)
       .eq('is_active', true)
       .eq('is_published', true)
       .order('name', { ascending: true });
@@ -445,25 +446,25 @@ export async function getGroceryProductsByCategory(
 }
 
 /**
- * Get a single category by ID
+ * Get a single vendor category by ID from vendor_categories table
  */
-export async function getCategory(categoryId: string): Promise<Category | null> {
+export async function getVendorCategory(categoryId: string): Promise<VendorCategory | null> {
   try {
     const supabase = await createServerClient();
     const { data, error } = await supabase
-      .from('categories')
+      .from('vendor_categories')
       .select('*')
       .eq('id', categoryId)
       .single();
 
     if (error) {
-      console.error('Error fetching category:', error);
+      console.error('Error fetching vendor category:', error);
       return null;
     }
 
-    return data as Category;
+    return data as VendorCategory;
   } catch (error) {
-    console.error('Error fetching category:', error);
+    console.error('Error fetching vendor category:', error);
     return null;
   }
 }

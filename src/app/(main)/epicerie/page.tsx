@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 
 function CategoriesSkeleton() {
   return (
-    <div className="grid grid-cols-3 gap-3">
+    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3 max-w-4xl mx-auto">
       {[...Array(12)].map((_, i) => (
         <div key={i}>
           <Skeleton className="aspect-square w-full rounded-xl" />
@@ -39,20 +39,20 @@ async function GroceryCategoriesContent() {
   }
 
   return (
-    <div className="grid grid-cols-3 gap-3">
+    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3 max-w-4xl mx-auto">
       {categories.map((category) => (
         <Link
           key={category.id}
           href={`/epicerie/${category.id}`}
           className="group"
         >
-          <div className="relative aspect-square rounded-xl overflow-hidden bg-muted">
+          <div className="relative aspect-square rounded-xl overflow-hidden bg-muted max-w-[150px] mx-auto">
             <SafeImage
               src={category.image_url || ''}
               alt={category.name}
               fill
               className="object-cover group-hover:scale-105 transition-transform duration-200"
-              sizes="(max-width: 640px) 33vw, 200px"
+              sizes="(max-width: 640px) 33vw, 150px"
               fallback={<span className="text-3xl">🛒</span>}
               fallbackClassName="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-50"
             />

@@ -3,7 +3,7 @@ import { Suspense } from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ChevronLeft, Search, ShoppingCart } from 'lucide-react';
-import { getCategory, getGroceryProductsByCategory, getGroceryVendor } from '@/actions/catalog';
+import { getVendorCategory, getGroceryProductsByCategory, getGroceryVendor } from '@/actions/catalog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -16,7 +16,7 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { categoryId } = await params;
-  const category = await getCategory(categoryId);
+  const category = await getVendorCategory(categoryId);
 
   if (!category) {
     return {
@@ -46,7 +46,7 @@ function ProductsSkeleton() {
 
 async function CategoryProductsContent({ categoryId }: { categoryId: string }) {
   const [category, products, vendor] = await Promise.all([
-    getCategory(categoryId),
+    getVendorCategory(categoryId),
     getGroceryProductsByCategory(categoryId),
     getGroceryVendor(),
   ]);
@@ -78,7 +78,7 @@ async function CategoryProductsContent({ categoryId }: { categoryId: string }) {
 
 export default async function GroceryCategoryPage({ params }: Props) {
   const { categoryId } = await params;
-  const category = await getCategory(categoryId);
+  const category = await getVendorCategory(categoryId);
 
   if (!category) {
     notFound();

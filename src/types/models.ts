@@ -130,6 +130,18 @@ export interface Category {
   created_at: string;
 }
 
+export interface VendorCategory {
+  id: string;
+  vendor_id: string;
+  name: string;
+  slug: string | null;
+  description: string | null;
+  image_url: string | null;
+  sort_order: number;
+  is_active: boolean;
+  created_at: string;
+}
+
 export interface Pack {
   id: string;
   vendor_id: string;
