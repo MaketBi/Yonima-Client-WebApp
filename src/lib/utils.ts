@@ -84,14 +84,16 @@ export function getInitials(name: string | null | undefined): string {
   return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
 }
 
+type DayKey = 'sunday' | 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday';
+
 /**
  * Check if vendor is currently open based on opening hours
  */
-export function isVendorOpen(openingHours: Record<string, { open: string; close: string }> | null): boolean {
+export function isVendorOpen(openingHours: Partial<Record<DayKey, { open: string; close: string }>> | null): boolean {
   if (!openingHours) return false;
 
   const now = new Date();
-  const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+  const days: DayKey[] = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
   const today = days[now.getDay()];
   const todayHours = openingHours[today];
 

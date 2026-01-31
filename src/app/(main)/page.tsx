@@ -1,177 +1,216 @@
 import Link from 'next/link';
-import { ChevronRight, MapPin, Clock, Star, Utensils, ShoppingBag, Store } from 'lucide-react';
+import { Suspense } from 'react';
+import { ChevronRight, Clock, Bike, MapPin, ShoppingBasket, Utensils, Store } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { ROUTES, APP_NAME } from '@/lib/constants';
+import { Skeleton } from '@/components/ui/skeleton';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { SafeImage } from '@/components/shared/safe-image';
+import { ROUTES } from '@/lib/constants';
+import { getVendorsByType } from '@/actions/catalog';
+import { formatPrice } from '@/lib/utils';
+import type { Vendor } from '@/types/models';
 
-// Placeholder data - will be replaced with real data from Supabase
-const featuredCategories = [
-  {
-    id: 'restaurants',
-    name: 'Restaurants',
-    icon: Utensils,
-    href: ROUTES.restaurants,
-    color: 'bg-orange-100 text-orange-600',
-  },
-  {
-    id: 'commerces',
-    name: 'Commerces',
-    icon: Store,
-    href: ROUTES.commerces,
-    color: 'bg-blue-100 text-blue-600',
-  },
-  {
-    id: 'epicerie',
-    name: 'Épicerie',
-    icon: ShoppingBag,
-    href: ROUTES.epicerie,
-    color: 'bg-green-100 text-green-600',
-  },
-];
+// Icônes épicerie (émojis pour le moment, à remplacer par de vraies icônes)
+const groceryIcons = ['🥕', '🛒', '☕', '🥬', '🐟', '🧃'];
+
+function VendorsSkeleton() {
+  return (
+    <div className="flex gap-4 overflow-hidden">
+      {[1, 2, 3].map((i) => (
+        <div key={i} className="w-[280px] shrink-0">
+          <Skeleton className="aspect-[4/3] w-full rounded-xl" />
+          <div className="mt-3 space-y-2">
+            <Skeleton className="h-5 w-3/4" />
+            <Skeleton className="h-4 w-1/2" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function VendorCard({ vendor, href }: { vendor: Vendor; href: string }) {
+  return (
+    <Link href={href} className="w-[280px] shrink-0">
+      <Card className="overflow-hidden border-0 shadow-sm">
+        <div className="relative aspect-[4/3] bg-muted">
+          <SafeImage
+            src={vendor.cover_image_url || ''}
+            alt={vendor.name}
+            fill
+            className="object-cover"
+            sizes="280px"
+            fallback={<span className="text-4xl">🏪</span>}
+            fallbackClassName="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-50"
+          />
+        </div>
+        <CardContent className="p-3">
+          <h3 className="font-semibold line-clamp-1">{vendor.name}</h3>
+          <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground">
+            {vendor.estimated_time && (
+              <span className="flex items-center gap-1">
+                <Clock className="h-3.5 w-3.5 text-primary" />
+                {vendor.estimated_time}
+              </span>
+            )}
+            <span className="flex items-center gap-1">
+              <Bike className="h-3.5 w-3.5 text-primary" />
+              {vendor.delivery_fee > 0 ? formatPrice(vendor.delivery_fee) : 'Gratuit'}
+            </span>
+          </div>
+        </CardContent>
+      </Card>
+    </Link>
+  );
+}
+
+async function RestaurantsSection() {
+  const restaurants = await getVendorsByType('restaurant', { limit: 10 });
+
+  if (restaurants.length === 0) {
+    return null;
+  }
+
+  return (
+    <section>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <Utensils className="h-5 w-5 text-primary" />
+          <h2 className="text-xl font-semibold">Restaurants</h2>
+        </div>
+        <Button variant="outline" size="icon" className="rounded-full h-9 w-9" asChild>
+          <Link href={ROUTES.restaurants}>
+            <ChevronRight className="h-5 w-5" />
+          </Link>
+        </Button>
+      </div>
+      <ScrollArea className="w-full">
+        <div className="flex gap-4 pb-4">
+          {restaurants.map((vendor) => (
+            <VendorCard
+              key={vendor.id}
+              vendor={vendor}
+              href={`/restaurants/${vendor.slug || vendor.id}`}
+            />
+          ))}
+        </div>
+        <ScrollBar orientation="horizontal" />
+      </ScrollArea>
+    </section>
+  );
+}
+
+async function CommercesSection() {
+  const commerces = await getVendorsByType('store', { limit: 10 });
+
+  if (commerces.length === 0) {
+    return null;
+  }
+
+  return (
+    <section>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <Store className="h-5 w-5 text-primary" />
+          <h2 className="text-xl font-semibold">Commerces</h2>
+        </div>
+        <Button variant="outline" size="icon" className="rounded-full h-9 w-9" asChild>
+          <Link href={ROUTES.commerces}>
+            <ChevronRight className="h-5 w-5" />
+          </Link>
+        </Button>
+      </div>
+      <ScrollArea className="w-full">
+        <div className="flex gap-4 pb-4">
+          {commerces.map((vendor) => (
+            <VendorCard
+              key={vendor.id}
+              vendor={vendor}
+              href={`/commerces/${vendor.slug || vendor.id}`}
+            />
+          ))}
+        </div>
+        <ScrollBar orientation="horizontal" />
+      </ScrollArea>
+    </section>
+  );
+}
 
 export default function HomePage() {
   return (
-    <div className="container py-6 space-y-8">
-      {/* Hero Section */}
-      <section className="relative rounded-2xl bg-gradient-to-r from-primary to-primary/80 text-primary-foreground p-8 md:p-12">
-        <div className="max-w-xl">
-          <h1 className="text-3xl md:text-4xl font-bold mb-4">
-            Bienvenue sur {APP_NAME}
-          </h1>
-          <p className="text-lg opacity-90 mb-6">
-            Commandez vos repas et courses préférés et faites-vous livrer rapidement à Dakar.
-          </p>
-          <div className="flex items-center gap-2 text-sm opacity-80">
-            <MapPin className="h-4 w-4" />
-            <span>Livraison dans tout Dakar</span>
+    <div className="pb-6">
+      {/* Location Header - Mobile style */}
+      <div className="container py-4 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+            <MapPin className="h-4 w-4 text-primary" />
           </div>
+          <span className="font-medium">Dakar</span>
+          <ChevronRight className="h-4 w-4 text-muted-foreground rotate-90" />
         </div>
-      </section>
+      </div>
 
-      {/* Categories */}
-      <section>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold">Catégories</h2>
-        </div>
-        <div className="grid grid-cols-3 gap-4">
-          {featuredCategories.map((category) => {
-            const Icon = category.icon;
-            return (
-              <Link key={category.id} href={category.href}>
-                <Card className="hover:shadow-md transition-shadow cursor-pointer">
-                  <CardContent className="flex flex-col items-center justify-center p-6">
-                    <div className={`rounded-full p-3 mb-3 ${category.color}`}>
-                      <Icon className="h-6 w-6" />
-                    </div>
-                    <span className="text-sm font-medium text-center">
-                      {category.name}
+      <div className="container space-y-8">
+        {/* Épicerie Section */}
+        <section>
+          <div className="flex items-center gap-2 mb-4">
+            <ShoppingBasket className="h-5 w-5 text-primary" />
+            <h2 className="text-xl font-semibold">Épicerie</h2>
+          </div>
+          <Link href={ROUTES.epicerie}>
+            <Card className="overflow-hidden border-0 bg-green-50">
+              <CardContent className="p-0">
+                <div className="relative p-6">
+                  {/* Time badge */}
+                  <div className="absolute top-4 right-4">
+                    <span className="bg-white/90 text-xs font-medium px-2 py-1 rounded">
+                      10-15 MIN
                     </span>
-                  </CardContent>
-                </Card>
-              </Link>
-            );
-          })}
-        </div>
-      </section>
+                  </div>
 
-      {/* Featured Restaurants */}
-      <section>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold">Restaurants populaires</h2>
-          <Button variant="ghost" size="sm" asChild>
-            <Link href={ROUTES.restaurants}>
-              Voir tout
-              <ChevronRight className="h-4 w-4 ml-1" />
-            </Link>
-          </Button>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {/* Placeholder cards - will be replaced with real data */}
-          {[1, 2, 3].map((i) => (
-            <Card key={i} className="overflow-hidden hover:shadow-md transition-shadow">
-              <div className="aspect-video bg-muted" />
-              <CardContent className="p-4">
-                <div className="flex items-start justify-between mb-2">
-                  <h3 className="font-semibold">Restaurant {i}</h3>
-                  <Badge variant="secondary" className="flex items-center gap-1">
-                    <Star className="h-3 w-3 fill-current" />
-                    4.5
-                  </Badge>
+                  {/* Grocery icons grid */}
+                  <div className="flex justify-center py-4">
+                    <div className="grid grid-cols-3 gap-6">
+                      {groceryIcons.map((icon, index) => (
+                        <div
+                          key={index}
+                          className="h-12 w-12 rounded-full bg-white/80 flex items-center justify-center text-2xl shadow-sm"
+                        >
+                          {icon}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
-                <p className="text-sm text-muted-foreground mb-3">
-                  Cuisine sénégalaise traditionnelle
-                </p>
-                <div className="flex items-center gap-4 text-xs text-muted-foreground">
+
+                {/* Bottom info bar */}
+                <div className="bg-white px-4 py-3 flex items-center gap-4 text-sm text-muted-foreground">
                   <span className="flex items-center gap-1">
-                    <Clock className="h-3 w-3" />
-                    20-30 min
+                    <Clock className="h-4 w-4 text-primary" />
+                    10-15 min
                   </span>
-                  <span>1 000 FCFA livraison</span>
+                  <span className="text-muted-foreground">•</span>
+                  <span className="flex items-center gap-1">
+                    <Bike className="h-4 w-4 text-primary" />
+                    500F
+                  </span>
                 </div>
               </CardContent>
             </Card>
-          ))}
-        </div>
-      </section>
+          </Link>
+        </section>
 
-      {/* Featured Packs */}
-      <section>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold">Packs du moment</h2>
-          <Button variant="ghost" size="sm" asChild>
-            <Link href="/packs">
-              Voir tout
-              <ChevronRight className="h-4 w-4 ml-1" />
-            </Link>
-          </Button>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* Placeholder cards - will be replaced with real data */}
-          {[1, 2, 3, 4].map((i) => (
-            <Card key={i} className="overflow-hidden hover:shadow-md transition-shadow">
-              <div className="aspect-square bg-muted" />
-              <CardContent className="p-4">
-                <h3 className="font-semibold mb-1">Pack Famille {i}</h3>
-                <p className="text-sm text-muted-foreground mb-2">
-                  Idéal pour 4 personnes
-                </p>
-                <p className="font-semibold text-primary">15 000 FCFA</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </section>
+        {/* Restaurants Section */}
+        <Suspense fallback={<VendorsSkeleton />}>
+          <RestaurantsSection />
+        </Suspense>
 
-      {/* CTA Section */}
-      <section className="rounded-2xl bg-muted p-8 text-center">
-        <h2 className="text-2xl font-bold mb-4">
-          Téléchargez notre application
-        </h2>
-        <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-          Profitez d&apos;une meilleure expérience avec notre application mobile et recevez des notifications en temps réel.
-        </p>
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <Button size="lg" asChild>
-            <a
-              href={process.env.NEXT_PUBLIC_IOS_APP_URL || '#'}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              App Store
-            </a>
-          </Button>
-          <Button size="lg" variant="outline" asChild>
-            <a
-              href={process.env.NEXT_PUBLIC_ANDROID_APP_URL || '#'}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Play Store
-            </a>
-          </Button>
-        </div>
-      </section>
+        {/* Commerces Section */}
+        <Suspense fallback={<VendorsSkeleton />}>
+          <CommercesSection />
+        </Suspense>
+      </div>
     </div>
   );
 }
