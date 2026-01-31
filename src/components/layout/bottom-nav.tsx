@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Home, Grid3X3, ShoppingCart, User } from 'lucide-react';
@@ -35,6 +36,12 @@ const navItems = [
 export function BottomNav() {
   const pathname = usePathname();
   const cartItemCount = useCartItemCount();
+  const [mounted, setMounted] = useState(false);
+
+  // Avoid hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Hide on certain pages
   const hiddenPaths = ['/login', '/register', '/checkout'];
@@ -61,7 +68,7 @@ export function BottomNav() {
             >
               <div className="relative">
                 <Icon className="h-5 w-5" />
-                {item.showBadge && cartItemCount > 0 && (
+                {mounted && item.showBadge && cartItemCount > 0 && (
                   <Badge
                     className="absolute -top-2 -right-2 h-4 w-4 flex items-center justify-center p-0 text-[10px]"
                   >

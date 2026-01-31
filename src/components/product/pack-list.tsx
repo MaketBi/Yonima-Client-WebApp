@@ -3,15 +3,16 @@
 import { PackCard } from './pack-card';
 import { EmptyState } from '@/components/shared/empty-state';
 import { Package } from 'lucide-react';
-import type { Pack } from '@/types/models';
+import type { Pack, Vendor } from '@/types/models';
 
 interface PackListProps {
   packs: Pack[];
   vendorId: string;
+  vendor?: Vendor;
   emptyMessage?: string;
 }
 
-export function PackList({ packs, vendorId, emptyMessage }: PackListProps) {
+export function PackList({ packs, vendorId, vendor, emptyMessage }: PackListProps) {
   if (packs.length === 0) {
     return (
       <EmptyState
@@ -25,7 +26,7 @@ export function PackList({ packs, vendorId, emptyMessage }: PackListProps) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       {packs.map((pack) => (
-        <PackCard key={pack.id} pack={pack} vendorId={vendorId} />
+        <PackCard key={pack.id} pack={pack} vendorId={vendorId} vendor={vendor} />
       ))}
     </div>
   );

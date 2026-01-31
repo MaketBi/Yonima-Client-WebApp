@@ -4,14 +4,15 @@ import { Plus, Minus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PriceDisplay } from '@/components/shared/price-display';
 import { useCartStore } from '@/stores/cart-store';
-import type { Pack } from '@/types/models';
+import type { Pack, Vendor } from '@/types/models';
 
 interface PackActionsProps {
   pack: Pack;
   vendorId: string;
+  vendor?: Vendor;
 }
 
-export function PackActions({ pack, vendorId }: PackActionsProps) {
+export function PackActions({ pack, vendorId, vendor }: PackActionsProps) {
   const { items, addItem, updateQuantity, removeItem, canAddFromEstablishment } = useCartStore();
 
   const cartItem = items.find((item) => item.id === pack.id && item.type === 'pack');
@@ -23,16 +24,19 @@ export function PackActions({ pack, vendorId }: PackActionsProps) {
       return;
     }
 
-    addItem({
-      id: pack.id,
-      type: 'pack',
-      name: pack.name,
-      image_url: pack.image_url,
-      price: pack.price,
-      quantity: 1,
-      vendor_id: vendorId,
-      establishment_id: vendorId,
-    });
+    addItem(
+      {
+        id: pack.id,
+        type: 'pack',
+        name: pack.name,
+        image_url: pack.image_url,
+        price: pack.price,
+        quantity: 1,
+        vendor_id: vendorId,
+        establishment_id: vendorId,
+      },
+      vendor
+    );
   };
 
   const handleIncrement = () => {

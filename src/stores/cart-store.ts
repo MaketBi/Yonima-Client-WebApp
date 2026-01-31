@@ -10,7 +10,7 @@ interface CartStore {
   establishment: Vendor | null;
 
   // Actions
-  addItem: (item: Omit<CartItem, 'quantity'> & { quantity?: number }) => void;
+  addItem: (item: Omit<CartItem, 'quantity'> & { quantity?: number }, vendor?: Vendor) => void;
   removeItem: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   incrementQuantity: (id: string) => void;
@@ -33,7 +33,7 @@ export const useCartStore = create<CartStore>()(
       vendorId: null,
       establishment: null,
 
-      addItem: (item) => {
+      addItem: (item, vendor) => {
         const { items, vendorId } = get();
 
         // Check if cart is from different vendor
@@ -52,10 +52,11 @@ export const useCartStore = create<CartStore>()(
           updatedItems[existingIndex].quantity += item.quantity ?? 1;
           set({ items: updatedItems });
         } else {
-          // Add new item
+          // Add new item and set establishment if provided
           set({
             items: [...items, { ...item, quantity: item.quantity ?? 1 }],
             vendorId: item.vendor_id,
+            ...(vendor && { establishment: vendor }),
           });
         }
       },

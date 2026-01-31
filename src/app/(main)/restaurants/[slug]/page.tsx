@@ -83,6 +83,7 @@ async function RestaurantContent({ slug }: { slug: string }) {
                 products={products}
                 categories={categories}
                 vendorId={vendor.id}
+                vendor={vendor}
                 emptyMessage="Aucun produit disponible pour le moment."
               />
             </div>
@@ -90,7 +91,7 @@ async function RestaurantContent({ slug }: { slug: string }) {
 
           <TabsContent value="packs" className="mt-0">
             <div className="container py-4">
-              <PackList packs={packs} vendorId={vendor.id} />
+              <PackList packs={packs} vendorId={vendor.id} vendor={vendor} />
             </div>
           </TabsContent>
         </Tabs>
@@ -102,6 +103,7 @@ async function RestaurantContent({ slug }: { slug: string }) {
               products={products}
               categories={categories}
               vendorId={vendor.id}
+              vendor={vendor}
               emptyMessage="Aucun produit disponible pour le moment."
             />
           </div>

@@ -9,16 +9,17 @@ import { Badge } from '@/components/ui/badge';
 import { PriceDisplay } from '@/components/shared/price-display';
 import { cn } from '@/lib/utils';
 import { useCartStore } from '@/stores/cart-store';
-import type { Pack } from '@/types/models';
+import type { Pack, Vendor } from '@/types/models';
 
 interface PackCardProps {
   pack: Pack;
   vendorId: string;
+  vendor?: Vendor;
   showVendor?: boolean;
   className?: string;
 }
 
-export function PackCard({ pack, vendorId, showVendor, className }: PackCardProps) {
+export function PackCard({ pack, vendorId, vendor, showVendor, className }: PackCardProps) {
   const { items, addItem, updateQuantity, removeItem, canAddFromEstablishment } = useCartStore();
 
   const cartItem = items.find((item) => item.id === pack.id && item.type === 'pack');
@@ -33,16 +34,19 @@ export function PackCard({ pack, vendorId, showVendor, className }: PackCardProp
       return;
     }
 
-    addItem({
-      id: pack.id,
-      type: 'pack',
-      name: pack.name,
-      image_url: pack.image_url,
-      price: pack.price,
-      quantity: 1,
-      vendor_id: vendorId,
-      establishment_id: vendorId,
-    });
+    addItem(
+      {
+        id: pack.id,
+        type: 'pack',
+        name: pack.name,
+        image_url: pack.image_url,
+        price: pack.price,
+        quantity: 1,
+        vendor_id: vendorId,
+        establishment_id: vendorId,
+      },
+      vendor
+    );
   };
 
   const handleIncrement = (e: React.MouseEvent) => {

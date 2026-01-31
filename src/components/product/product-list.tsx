@@ -3,12 +3,13 @@
 import { ProductCard } from './product-card';
 import { EmptyState } from '@/components/shared/empty-state';
 import { Package } from 'lucide-react';
-import type { Product, Category } from '@/types/models';
+import type { Product, Category, Vendor } from '@/types/models';
 
 interface ProductListProps {
   products: Product[];
   categories?: Category[];
   vendorId: string;
+  vendor?: Vendor;
   onProductClick?: (product: Product) => void;
   emptyMessage?: string;
 }
@@ -17,6 +18,7 @@ export function ProductList({
   products,
   categories,
   vendorId,
+  vendor,
   onProductClick,
   emptyMessage,
 }: ProductListProps) {
@@ -55,6 +57,7 @@ export function ProductList({
                   key={product.id}
                   product={product}
                   vendorId={vendorId}
+                  vendor={vendor}
                   onClick={() => onProductClick?.(product)}
                 />
               ))}
@@ -71,6 +74,7 @@ export function ProductList({
                   key={product.id}
                   product={product}
                   vendorId={vendorId}
+                  vendor={vendor}
                   onClick={() => onProductClick?.(product)}
                 />
               ))}
@@ -89,6 +93,7 @@ export function ProductList({
           key={product.id}
           product={product}
           vendorId={vendorId}
+          vendor={vendor}
           onClick={() => onProductClick?.(product)}
         />
       ))}

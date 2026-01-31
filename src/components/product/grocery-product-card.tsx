@@ -6,14 +6,15 @@ import { Card } from '@/components/ui/card';
 import { SafeImage } from '@/components/shared/safe-image';
 import { formatPrice } from '@/lib/utils';
 import { useCartStore } from '@/stores/cart-store';
-import type { Product } from '@/types/models';
+import type { Product, Vendor } from '@/types/models';
 
 interface GroceryProductCardProps {
   product: Product;
   vendorId: string;
+  vendor?: Vendor;
 }
 
-export function GroceryProductCard({ product, vendorId }: GroceryProductCardProps) {
+export function GroceryProductCard({ product, vendorId, vendor }: GroceryProductCardProps) {
   const { items, addItem, updateQuantity, removeItem, canAddFromEstablishment } = useCartStore();
 
   const cartItem = items.find((item) => item.id === product.id && item.type === 'product');
@@ -28,16 +29,19 @@ export function GroceryProductCard({ product, vendorId }: GroceryProductCardProp
       return;
     }
 
-    addItem({
-      id: product.id,
-      type: 'product',
-      name: product.name,
-      image_url: product.image_url,
-      price: product.price,
-      quantity: 1,
-      vendor_id: vendorId,
-      establishment_id: vendorId,
-    });
+    addItem(
+      {
+        id: product.id,
+        type: 'product',
+        name: product.name,
+        image_url: product.image_url,
+        price: product.price,
+        quantity: 1,
+        vendor_id: vendorId,
+        establishment_id: vendorId,
+      },
+      vendor
+    );
   };
 
   const handleIncrement = (e: React.MouseEvent) => {

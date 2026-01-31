@@ -70,6 +70,7 @@ async function CategoryProductsContent({ categoryId }: { categoryId: string }) {
           key={product.id}
           product={product}
           vendorId={vendor?.id || product.vendor_id}
+          vendor={vendor || undefined}
         />
       ))}
     </div>
