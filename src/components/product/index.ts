@@ -5,3 +5,4 @@ export { CategoryNav } from './category-nav';
 export { PackCard } from './pack-card';
 export { PackList } from './pack-list';
 export { PackActions } from './pack-actions';
+export { GroceryProductCard } from './grocery-product-card';

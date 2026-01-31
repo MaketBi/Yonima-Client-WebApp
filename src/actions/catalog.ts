@@ -336,81 +336,91 @@ export async function searchCatalog(
 }
 
 /**
+ * Get the single grocery vendor (Épicerie Yonima)
+ */
+export async function getGroceryVendor(): Promise<Vendor | null> {
+  try {
+    const supabase = await createServerClient();
+    const { data, error } = await supabase
+      .from('vendors')
+      .select('*')
+      .eq('type', 'grocery')
+      .eq('is_active', true)
+      .limit(1)
+      .single();
+
+    if (error) {
+      console.error('Error fetching grocery vendor:', error);
+      return null;
+    }
+
+    return data as Vendor;
+  } catch (error) {
+    console.error('Error fetching grocery vendor:', error);
+    return null;
+  }
+}
+
+/**
  * Get grocery categories (for epicerie page)
  */
-export async function getGroceryCategories(): Promise<Category[]> {
+export async function getGroceryCategories(): Promise<{ categories: Category[]; vendorId: string | null }> {
   try {
     const supabase = await createServerClient();
 
-    // Get all categories from grocery vendors
-    const { data: vendors } = await supabase
+    // Get the grocery vendor
+    const { data: vendor } = await supabase
       .from('vendors')
       .select('id')
       .eq('type', 'grocery')
-      .eq('is_active', true);
+      .eq('is_active', true)
+      .limit(1)
+      .single();
 
-    if (!vendors || vendors.length === 0) {
-      return [];
+    if (!vendor) {
+      return { categories: [], vendorId: null };
     }
-
-    const vendorIds = vendors.map((v) => v.id);
 
     const { data, error } = await supabase
       .from('categories')
       .select('*')
-      .in('vendor_id', vendorIds)
+      .eq('vendor_id', vendor.id)
       .eq('is_active', true)
       .order('name', { ascending: true });
 
     if (error) {
       console.error('Error fetching grocery categories:', error);
-      return [];
+      return { categories: [], vendorId: vendor.id };
     }
 
-    // Deduplicate by name
-    const uniqueCategories = data.reduce((acc: Category[], category) => {
-      if (!acc.find((c) => c.name.toLowerCase() === category.name.toLowerCase())) {
-        acc.push(category);
-      }
-      return acc;
-    }, []);
-
-    return uniqueCategories;
+    return { categories: data as Category[], vendorId: vendor.id };
   } catch (error) {
     console.error('Error fetching grocery categories:', error);
-    return [];
+    return { categories: [], vendorId: null };
   }
 }
 
 /**
- * Get products by grocery category name
+ * Get products by grocery category ID
  */
 export async function getGroceryProductsByCategory(
-  categoryName: string,
-  options?: { limit?: number; offset?: number }
+  categoryId: string,
+  options?: { limit?: number; offset?: number; search?: string }
 ): Promise<Product[]> {
   try {
     const supabase = await createServerClient();
 
-    // Get categories with this name
-    const { data: categories } = await supabase
-      .from('categories')
-      .select('id')
-      .ilike('name', categoryName);
-
-    if (!categories || categories.length === 0) {
-      return [];
-    }
-
-    const categoryIds = categories.map((c) => c.id);
-
     let query = supabase
       .from('products')
-      .select('*, vendor:vendors(id, name, logo_url, type)')
-      .in('category_id', categoryIds)
+      .select('*')
+      .eq('category_id', categoryId)
       .eq('is_active', true)
       .eq('is_published', true)
-      .order('popularity_score', { ascending: false });
+      .order('name', { ascending: true });
+
+    if (options?.search) {
+      query = query.ilike('name', `%${options.search}%`);
+    }
 
     if (options?.limit) {
       query = query.limit(options.limit);
@@ -431,5 +441,29 @@ export async function getGroceryProductsByCategory(
   } catch (error) {
     console.error('Error fetching grocery products:', error);
     return [];
+  }
+}
+
+/**
+ * Get a single category by ID
+ */
+export async function getCategory(categoryId: string): Promise<Category | null> {
+  try {
+    const supabase = await createServerClient();
+    const { data, error } = await supabase
+      .from('categories')
+      .select('*')
+      .eq('id', categoryId)
+      .single();
+
+    if (error) {
+      console.error('Error fetching category:', error);
+      return null;
+    }
+
+    return data as Category;
+  } catch (error) {
+    console.error('Error fetching category:', error);
+    return null;
   }
 }

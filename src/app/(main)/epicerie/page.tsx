@@ -1,106 +1,66 @@
 import { Metadata } from 'next';
 import { Suspense } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
-import { getGroceryCategories, getVendorsByType } from '@/actions/catalog';
-import { Card, CardContent } from '@/components/ui/card';
+import { ChevronLeft, Search, ShoppingCart } from 'lucide-react';
+import { getGroceryCategories } from '@/actions/catalog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
-import { EmptyState } from '@/components/shared/empty-state';
-import { ShoppingBasket } from 'lucide-react';
+import { SafeImage } from '@/components/shared/safe-image';
+import { ROUTES } from '@/lib/constants';
 
 export const metadata: Metadata = {
-  title: 'Épicerie',
+  title: 'Épicerie en ligne',
   description: 'Faites vos courses en ligne et recevez-les rapidement à Dakar.',
 };
 
 function CategoriesSkeleton() {
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-      {[...Array(10)].map((_, i) => (
-        <div key={i} className="rounded-lg overflow-hidden">
-          <Skeleton className="aspect-square w-full" />
-          <div className="p-3">
-            <Skeleton className="h-5 w-3/4 mx-auto" />
-          </div>
+    <div className="grid grid-cols-3 gap-3">
+      {[...Array(12)].map((_, i) => (
+        <div key={i}>
+          <Skeleton className="aspect-square w-full rounded-xl" />
+          <Skeleton className="h-4 w-3/4 mx-auto mt-2" />
         </div>
       ))}
     </div>
   );
 }
 
-interface CategoryCardProps {
-  name: string;
-  imageUrl?: string | null;
-  href: string;
-}
-
-function CategoryCard({ name, imageUrl, href }: CategoryCardProps) {
-  return (
-    <Link href={href}>
-      <Card className="overflow-hidden hover:shadow-md transition-shadow">
-        <div className="relative aspect-square bg-muted">
-          {imageUrl ? (
-            <Image
-              src={imageUrl}
-              alt={name}
-              fill
-              className="object-cover"
-              sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 20vw"
-            />
-          ) : (
-            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-green-100 to-green-50">
-              <ShoppingBasket className="h-12 w-12 text-green-600/50" />
-            </div>
-          )}
-        </div>
-        <CardContent className="p-3">
-          <h3 className="font-medium text-center line-clamp-1">{name}</h3>
-        </CardContent>
-      </Card>
-    </Link>
-  );
-}
-
 async function GroceryCategoriesContent() {
-  const categories = await getGroceryCategories();
+  const { categories, vendorId } = await getGroceryCategories();
 
   if (categories.length === 0) {
-    // Fallback: show grocery vendors instead
-    const groceryVendors = await getVendorsByType('grocery');
-
-    if (groceryVendors.length === 0) {
-      return (
-        <EmptyState
-          icon={ShoppingBasket}
-          title="Épicerie bientôt disponible"
-          description="Notre service d'épicerie sera bientôt disponible. Revenez nous voir !"
-        />
-      );
-    }
-
     return (
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-        {groceryVendors.map((vendor) => (
-          <CategoryCard
-            key={vendor.id}
-            name={vendor.name}
-            imageUrl={vendor.logo_url}
-            href={`/epicerie/${vendor.slug || vendor.id}`}
-          />
-        ))}
+      <div className="text-center py-12">
+        <p className="text-muted-foreground">Aucune catégorie disponible pour le moment.</p>
       </div>
     );
   }
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+    <div className="grid grid-cols-3 gap-3">
       {categories.map((category) => (
-        <CategoryCard
+        <Link
           key={category.id}
-          name={category.name}
-          imageUrl={category.image_url}
-          href={`/epicerie/${encodeURIComponent(category.name.toLowerCase())}`}
-        />
+          href={`/epicerie/${category.id}`}
+          className="group"
+        >
+          <div className="relative aspect-square rounded-xl overflow-hidden bg-muted">
+            <SafeImage
+              src={category.image_url || ''}
+              alt={category.name}
+              fill
+              className="object-cover group-hover:scale-105 transition-transform duration-200"
+              sizes="(max-width: 640px) 33vw, 200px"
+              fallback={<span className="text-3xl">🛒</span>}
+              fallbackClassName="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-50"
+            />
+          </div>
+          <p className="text-sm font-medium text-center mt-2 line-clamp-2">
+            {category.name}
+          </p>
+        </Link>
       ))}
     </div>
   );
@@ -108,17 +68,39 @@ async function GroceryCategoriesContent() {
 
 export default function EpiceriePage() {
   return (
-    <div className="container py-6">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold">Épicerie</h1>
-        <p className="text-muted-foreground">
-          Faites vos courses en ligne et recevez-les rapidement
-        </p>
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <div className="sticky top-0 z-50 bg-background border-b">
+        <div className="container flex items-center justify-between h-14">
+          <Button variant="ghost" size="icon" className="rounded-full" asChild>
+            <Link href="/">
+              <ChevronLeft className="h-5 w-5" />
+            </Link>
+          </Button>
+          <h1 className="font-semibold text-lg">Épicerie en ligne</h1>
+          <Button variant="ghost" size="icon" className="rounded-full" asChild>
+            <Link href={ROUTES.panier}>
+              <ShoppingCart className="h-5 w-5" />
+            </Link>
+          </Button>
+        </div>
       </div>
 
-      <Suspense fallback={<CategoriesSkeleton />}>
-        <GroceryCategoriesContent />
-      </Suspense>
+      <div className="container py-4 space-y-4">
+        {/* Search Bar */}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Rechercher un produit..."
+            className="pl-10 bg-muted/50 border-0"
+          />
+        </div>
+
+        {/* Categories Grid */}
+        <Suspense fallback={<CategoriesSkeleton />}>
+          <GroceryCategoriesContent />
+        </Suspense>
+      </div>
     </div>
   );
 }
