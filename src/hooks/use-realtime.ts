@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import type { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 import { createClient } from '@/lib/supabase/client';
 import type { Order } from '@/types/models';
 
@@ -60,7 +61,7 @@ export function useRealtimeOrder(orderId: string | null) {
           table: 'orders',
           filter: `id=eq.${orderId}`,
         },
-        (payload) => {
+        (payload: RealtimePostgresChangesPayload<Record<string, unknown>>) => {
           setOrder((prev) =>
             prev ? { ...prev, ...payload.new } : (payload.new as Order)
           );
@@ -137,20 +138,20 @@ export function useRealtimeOrders(userId: string | null) {
           table: 'orders',
           filter: `user_id=eq.${userId}`,
         },
-        (payload) => {
+        (payload: RealtimePostgresChangesPayload<Record<string, unknown>>) => {
           if (payload.eventType === 'INSERT') {
-            setOrders((prev) => [payload.new as Order, ...prev]);
+            setOrders((prev) => [payload.new as unknown as Order, ...prev]);
           } else if (payload.eventType === 'UPDATE') {
             setOrders((prev) =>
               prev.map((order) =>
-                order.id === payload.new.id
-                  ? { ...order, ...payload.new }
+                order.id === (payload.new as unknown as Order).id
+                  ? { ...order, ...(payload.new as unknown as Order) }
                   : order
               )
             );
           } else if (payload.eventType === 'DELETE') {
             setOrders((prev) =>
-              prev.filter((order) => order.id !== payload.old.id)
+              prev.filter((order) => order.id !== (payload.old as unknown as Order).id)
             );
           }
         }

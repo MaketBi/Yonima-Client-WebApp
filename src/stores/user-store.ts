@@ -1,18 +1,20 @@
 'use client';
 
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
 import type { User, DeliveryAddress } from '@/types/models';
 
 interface UserStore {
   user: User | null;
   isLoading: boolean;
+  _hasHydrated: boolean;
   deliveryAddress: DeliveryAddress | null;
   savedAddresses: DeliveryAddress[];
 
   // Actions
   setUser: (user: User | null) => void;
   setLoading: (loading: boolean) => void;
+  setHasHydrated: (state: boolean) => void;
   setDeliveryAddress: (address: DeliveryAddress | null) => void;
   setSavedAddresses: (addresses: DeliveryAddress[]) => void;
   addSavedAddress: (address: DeliveryAddress) => void;
@@ -25,12 +27,15 @@ export const useUserStore = create<UserStore>()(
     (set, get) => ({
       user: null,
       isLoading: true,
+      _hasHydrated: false,
       deliveryAddress: null,
       savedAddresses: [],
 
       setUser: (user) => set({ user, isLoading: false }),
 
       setLoading: (isLoading) => set({ isLoading }),
+
+      setHasHydrated: (_hasHydrated) => set({ _hasHydrated }),
 
       setDeliveryAddress: (deliveryAddress) => set({ deliveryAddress }),
 
@@ -64,10 +69,21 @@ export const useUserStore = create<UserStore>()(
     }),
     {
       name: 'yonima-user',
+      storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
+        user: state.user,
         deliveryAddress: state.deliveryAddress,
         savedAddresses: state.savedAddresses,
       }),
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          state.setHasHydrated(true);
+          // If user was restored from storage, stop loading immediately
+          if (state.user) {
+            state.setLoading(false);
+          }
+        }
+      },
     }
   )
 );

@@ -34,12 +34,12 @@ export function useFeatures() {
           return;
         }
 
-        const featuresMap = data?.reduce(
-          (acc, f) => {
+        const featuresMap = (data ?? []).reduce(
+          (acc: Features, f: { feature_key: string; is_enabled: boolean }) => {
             acc[f.feature_key as keyof Features] = f.is_enabled;
             return acc;
           },
-          { ...DEFAULT_FEATURES }
+          { ...DEFAULT_FEATURES } as Features
         );
 
         setFeatures(featuresMap);

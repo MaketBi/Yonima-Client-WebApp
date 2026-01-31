@@ -18,9 +18,10 @@ import {
 import { PhoneInput } from './phone-input';
 import { OtpModal } from './otp-modal';
 import { requestOtp, verifyOtp } from '@/actions/auth';
+import { createClient } from '@/lib/supabase/client';
 import { canAttempt, recordAttempt, resetAttempts, getWaitTimeSeconds } from '@/lib/rate-limiter';
 import { sanitizeName, isValidName } from '@/lib/validators';
-import type { CountryData, OTPChannel, AuthErrorType } from '@/types/auth';
+import type { CountryData, OTPChannel } from '@/types/auth';
 import { APP_NAME } from '@/lib/constants';
 
 interface AuthFormProps {
@@ -141,10 +142,17 @@ export function AuthForm({
 
       const result = await verifyOtp(fullPhone, code);
 
-      if (result.success) {
+      if (result.success && result.accessToken) {
         // Reset rate limiters
         resetAttempts(rateLimitKey);
         resetAttempts(`otp_request:${fullPhone}`);
+
+        // Initialize Supabase session on client side
+        const supabase = createClient();
+        await supabase.auth.setSession({
+          access_token: result.accessToken,
+          refresh_token: result.refreshToken || '',
+        });
 
         // Close modal and redirect
         setShowOtpModal(false);

@@ -190,6 +190,8 @@ export async function verifyOtp(
   success: boolean;
   userId?: string;
   isNewUser?: boolean;
+  accessToken?: string;
+  refreshToken?: string;
   error?: string;
   errorType?: AuthErrorType;
 }> {
@@ -216,34 +218,13 @@ export async function verifyOtp(
     const result: OtpVerifyResponse = await response.json();
 
     if (result.success && result.access_token) {
-      // Set auth cookies for Supabase SSR
-      const cookieStore = await cookies();
-
-      // Set the session cookies that Supabase SSR expects
-      const maxAge = result.expires_in || 3600;
-
-      cookieStore.set('sb-access-token', result.access_token, {
-        path: '/',
-        maxAge,
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-      });
-
-      if (result.refresh_token) {
-        cookieStore.set('sb-refresh-token', result.refresh_token, {
-          path: '/',
-          maxAge: 60 * 60 * 24 * 30, // 30 days
-          httpOnly: true,
-          secure: process.env.NODE_ENV === 'production',
-          sameSite: 'lax',
-        });
-      }
-
+      // Return tokens to client for session initialization
       return {
         success: true,
         userId: result.user_id,
         isNewUser: result.is_new_user,
+        accessToken: result.access_token,
+        refreshToken: result.refresh_token,
       };
     } else {
       const { message, errorType } = parseVerifyError(result.error, result.expired);

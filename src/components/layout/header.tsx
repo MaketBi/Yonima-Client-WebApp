@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Menu, ShoppingCart, User, Bell, Search } from 'lucide-react';
@@ -9,7 +10,6 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/use-auth';
 import { useCartItemCount } from '@/stores/cart-store';
-import { useUnreadNotificationsCount } from '@/hooks/use-realtime';
 import { APP_NAME, ROUTES } from '@/lib/constants';
 
 const navLinks = [
@@ -21,9 +21,14 @@ const navLinks = [
 
 export function Header() {
   const pathname = usePathname();
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, isLoading } = useAuth();
   const cartItemCount = useCartItemCount();
-  const unreadCount = useUnreadNotificationsCount(user?.id || null);
+  const [mounted, setMounted] = useState(false);
+
+  // Avoid hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -62,18 +67,10 @@ export function Header() {
           </Button>
 
           {/* Notifications */}
-          {isAuthenticated && (
+          {mounted && isAuthenticated && (
             <Button variant="ghost" size="icon" asChild className="relative">
               <Link href={ROUTES.notifications}>
                 <Bell className="h-5 w-5" />
-                {unreadCount > 0 && (
-                  <Badge
-                    variant="destructive"
-                    className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
-                  >
-                    {unreadCount > 9 ? '9+' : unreadCount}
-                  </Badge>
-                )}
                 <span className="sr-only">Notifications</span>
               </Link>
             </Button>
@@ -94,18 +91,25 @@ export function Header() {
             </Link>
           </Button>
 
-          {/* Profile / Login */}
-          {isAuthenticated ? (
-            <Button variant="ghost" size="icon" asChild>
+          {/* Profile / Login - Show based on auth state */}
+          {mounted && (
+            isAuthenticated ? (
               <Link href={ROUTES.profil}>
-                <User className="h-5 w-5" />
-                <span className="sr-only">Profil</span>
+                <Button variant="ghost" size="icon">
+                  <User className="h-5 w-5" />
+                  <span className="sr-only">Profil</span>
+                </Button>
               </Link>
-            </Button>
-          ) : (
-            <Button variant="default" size="sm" asChild className="hidden sm:flex">
-              <Link href={ROUTES.login}>Connexion</Link>
-            </Button>
+            ) : !isLoading ? (
+              <Link href={ROUTES.login} className="hidden sm:block">
+                <Button variant="default" size="sm">
+                  Connexion
+                </Button>
+              </Link>
+            ) : (
+              // Show placeholder while loading (only if not authenticated)
+              <div className="w-9 h-9" />
+            )
           )}
 
           {/* Mobile Menu */}
@@ -133,7 +137,7 @@ export function Header() {
                   </Link>
                 ))}
                 <hr className="my-4" />
-                {isAuthenticated ? (
+                {mounted && isAuthenticated ? (
                   <>
                     <Link
                       href={ROUTES.commandes}
