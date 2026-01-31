@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ChevronLeft, Minus, Plus, Trash2, ShoppingBag, MapPin } from 'lucide-react';
+import { ChevronLeft, Minus, Plus, Trash2, ShoppingBag, MapPin, PlusCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { SafeImage } from '@/components/shared/safe-image';
@@ -31,6 +31,25 @@ export default function PanierPage() {
   const subtotal = getSubtotal();
   const deliveryFee = getDeliveryFee();
   const total = getTotal();
+
+  // Get the URL to add more items from the same establishment
+  const getEstablishmentUrl = () => {
+    if (!establishment) return '/';
+
+    const { type, slug, id } = establishment;
+    const identifier = slug || id;
+
+    switch (type) {
+      case 'restaurant':
+        return `/restaurants/${identifier}`;
+      case 'store':
+        return `/commerces/${identifier}`;
+      case 'grocery':
+        return '/epicerie';
+      default:
+        return '/';
+    }
+  };
 
   const handleCheckout = async () => {
     if (!user) {
@@ -184,6 +203,18 @@ export default function PanierPage() {
             </div>
           ))}
         </Card>
+
+        {/* Add more items button */}
+        <Button
+          variant="outline"
+          className="w-full h-12 border-dashed border-2"
+          asChild
+        >
+          <Link href={getEstablishmentUrl()}>
+            <PlusCircle className="h-5 w-5 mr-2" />
+            Ajouter d'autres articles
+          </Link>
+        </Button>
 
         {/* Delivery Address */}
         <Card className="p-4">
