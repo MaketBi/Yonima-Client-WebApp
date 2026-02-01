@@ -3,14 +3,16 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ChevronLeft, Minus, Plus, Trash2, ShoppingBag, MapPin, PlusCircle } from 'lucide-react';
+import { ChevronLeft, Minus, Plus, Trash2, ShoppingBag, MapPin, PlusCircle, ChevronRight, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { SafeImage } from '@/components/shared/safe-image';
 import { useCartStore } from '@/stores/cart-store';
+import { useDeliveryAddressStore } from '@/stores/delivery-address-store';
 import { useAuth } from '@/hooks/use-auth';
 import { formatPrice } from '@/lib/utils';
 import { ROUTES } from '@/lib/constants';
+import { AddressPickerScreen } from '@/components/checkout/address-picker-screen';
 
 export default function PanierPage() {
   const router = useRouter();
@@ -26,7 +28,19 @@ export default function PanierPage() {
     getTotal,
   } = useCartStore();
 
+  // Delivery address from shared store - subscribe to specific values for reactivity
+  const {
+    formattedAddress,
+    city,
+    neighborhood,
+    additionalInfo,
+    isZoneCovered,
+    hasAddress,
+    getFullAddress,
+  } = useDeliveryAddressStore();
+
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isAddressPickerOpen, setIsAddressPickerOpen] = useState(false);
 
   const subtotal = getSubtotal();
   const deliveryFee = getDeliveryFee();
@@ -51,15 +65,30 @@ export default function PanierPage() {
     }
   };
 
+  // Check if address is valid
+  const hasValidAddress = hasAddress() && isZoneCovered;
+
+  // Get display address
+  const getDisplayAddress = () => {
+    if (!hasAddress()) {
+      return null;
+    }
+    return getFullAddress();
+  };
+
   const handleCheckout = async () => {
     if (!user) {
       router.push(ROUTES.login);
       return;
     }
 
+    // Check if address is set
+    if (!hasValidAddress) {
+      setIsAddressPickerOpen(true);
+      return;
+    }
+
     setIsProcessing(true);
-    // TODO: Implement checkout flow
-    // For now, redirect to a checkout page or show order confirmation
     router.push('/commandes/nouveau');
   };
 
@@ -95,6 +124,8 @@ export default function PanierPage() {
       </div>
     );
   }
+
+  const displayAddress = getDisplayAddress();
 
   return (
     <div className="min-h-screen bg-gray-50 pb-40">
@@ -212,27 +243,58 @@ export default function PanierPage() {
         >
           <Link href={getEstablishmentUrl()}>
             <PlusCircle className="h-5 w-5 mr-2" />
-            Ajouter d'autres articles
+            Ajouter d&apos;autres articles
           </Link>
         </Button>
 
         {/* Delivery Address */}
-        <Card className="p-4">
+        <Card
+          className="p-4 cursor-pointer hover:bg-gray-50 transition-colors"
+          onClick={() => setIsAddressPickerOpen(true)}
+        >
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-              <MapPin className="h-5 w-5 text-primary" />
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+              displayAddress ? 'bg-primary/10' : 'bg-orange-100'
+            }`}>
+              {displayAddress ? (
+                <MapPin className="h-5 w-5 text-primary" />
+              ) : (
+                <AlertTriangle className="h-5 w-5 text-orange-600" />
+              )}
             </div>
-            <div className="flex-1">
+            <div className="flex-1 min-w-0">
               <p className="text-sm text-muted-foreground">Adresse de livraison</p>
-              <p className="font-medium">Sélectionner une adresse</p>
+              {displayAddress ? (
+                <p className="font-medium truncate">{displayAddress}</p>
+              ) : (
+                <p className="font-medium text-orange-600">Sélectionner une adresse</p>
+              )}
+              {additionalInfo && displayAddress && (
+                <p className="text-xs text-muted-foreground truncate mt-0.5">
+                  {additionalInfo}
+                </p>
+              )}
             </div>
-            <ChevronLeft className="h-5 w-5 text-muted-foreground rotate-180" />
+            <ChevronRight className="h-5 w-5 text-muted-foreground flex-shrink-0" />
           </div>
         </Card>
+
+        {/* Zone not covered warning */}
+        {hasAddress() && !isZoneCovered && (
+          <div className="flex items-start gap-3 p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
+            <AlertTriangle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-medium text-destructive">Zone non couverte</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                L&apos;adresse sélectionnée n&apos;est pas dans notre zone de livraison. Veuillez choisir une autre adresse.
+              </p>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Bottom Summary */}
-      <div className="fixed bottom-0 left-0 right-0 bg-background border-t shadow-lg">
+      <div className="fixed bottom-16 left-0 right-0 bg-background border-t shadow-lg">
         <div className="container py-4 space-y-3">
           {/* Price Summary */}
           <div className="space-y-2">
@@ -256,10 +318,16 @@ export default function PanierPage() {
             onClick={handleCheckout}
             disabled={isProcessing}
           >
-            {isProcessing ? 'Traitement...' : 'Commander'}
+            {isProcessing ? 'Traitement...' : hasValidAddress ? 'Commander' : 'Sélectionner une adresse'}
           </Button>
         </div>
       </div>
+
+      {/* Address Picker Dialog */}
+      <AddressPickerScreen
+        open={isAddressPickerOpen}
+        onOpenChange={setIsAddressPickerOpen}
+      />
     </div>
   );
 }

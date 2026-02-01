@@ -13,6 +13,7 @@ export interface User {
   vendor_id: string | null;
   is_active: boolean;
   avatar_url: string | null;
+  default_landmark: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -458,8 +459,23 @@ export interface DeliveryAddress {
   address: string;
   latitude: number | null;
   longitude: number | null;
+  additional_info: string | null;
   is_default: boolean;
   created_at: string;
+}
+
+// ============================================
+// NEIGHBORHOODS (Delivery Zones)
+// ============================================
+
+export interface Neighborhood {
+  id: string;
+  name: string;
+  city: string;
+  latitude: number;
+  longitude: number;
+  radius: number;
+  is_active: boolean;
 }
 
 // ============================================

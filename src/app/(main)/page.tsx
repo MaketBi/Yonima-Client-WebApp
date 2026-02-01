@@ -1,11 +1,12 @@
 import Link from 'next/link';
 import { Suspense } from 'react';
-import { ChevronRight, Clock, Bike, MapPin, ShoppingBasket, Utensils, Store } from 'lucide-react';
+import { ChevronRight, Clock, Bike, ShoppingBasket, Utensils, Store } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { SafeImage } from '@/components/shared/safe-image';
+import { LocationPickerButton } from '@/components/shared/location-picker-button';
 import { ROUTES } from '@/lib/constants';
 import { getVendorsByType } from '@/actions/catalog';
 import { formatPrice } from '@/lib/utils';
@@ -142,13 +143,7 @@ export default function HomePage() {
     <div className="pb-6">
       {/* Location Header - Mobile style */}
       <div className="container py-4 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-            <MapPin className="h-4 w-4 text-primary" />
-          </div>
-          <span className="font-medium">Dakar</span>
-          <ChevronRight className="h-4 w-4 text-muted-foreground rotate-90" />
-        </div>
+        <LocationPickerButton />
       </div>
 
       <div className="container space-y-8">

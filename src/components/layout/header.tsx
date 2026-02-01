@@ -112,63 +112,70 @@ export function Header() {
             )
           )}
 
-          {/* Mobile Menu */}
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="md:hidden">
-                <Menu className="h-5 w-5" />
-                <span className="sr-only">Menu</span>
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="w-[300px] sm:w-[400px]">
-              <nav className="flex flex-col space-y-4 mt-8">
-                {navLinks.map((link) => (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className={cn(
-                      'text-lg font-medium transition-colors hover:text-primary',
-                      pathname === link.href
-                        ? 'text-primary'
-                        : 'text-muted-foreground'
-                    )}
-                  >
-                    {link.label}
-                  </Link>
-                ))}
-                <hr className="my-4" />
-                {mounted && isAuthenticated ? (
-                  <>
+          {/* Mobile Menu - Only render after mount to avoid hydration mismatch */}
+          {mounted ? (
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="md:hidden">
+                  <Menu className="h-5 w-5" />
+                  <span className="sr-only">Menu</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+                <nav className="flex flex-col space-y-4 mt-8">
+                  {navLinks.map((link) => (
                     <Link
-                      href={ROUTES.commandes}
-                      className="text-lg font-medium text-muted-foreground hover:text-primary"
+                      key={link.href}
+                      href={link.href}
+                      className={cn(
+                        'text-lg font-medium transition-colors hover:text-primary',
+                        pathname === link.href
+                          ? 'text-primary'
+                          : 'text-muted-foreground'
+                      )}
                     >
-                      Mes commandes
+                      {link.label}
                     </Link>
+                  ))}
+                  <hr className="my-4" />
+                  {isAuthenticated ? (
+                    <>
+                      <Link
+                        href={ROUTES.commandes}
+                        className="text-lg font-medium text-muted-foreground hover:text-primary"
+                      >
+                        Mes commandes
+                      </Link>
+                      <Link
+                        href={ROUTES.fidelite}
+                        className="text-lg font-medium text-muted-foreground hover:text-primary"
+                      >
+                        Ma fidélité
+                      </Link>
+                      <Link
+                        href={ROUTES.profil}
+                        className="text-lg font-medium text-muted-foreground hover:text-primary"
+                      >
+                        Mon profil
+                      </Link>
+                    </>
+                  ) : (
                     <Link
-                      href={ROUTES.fidelite}
-                      className="text-lg font-medium text-muted-foreground hover:text-primary"
+                      href={ROUTES.login}
+                      className="text-lg font-medium text-primary"
                     >
-                      Ma fidélité
+                      Connexion
                     </Link>
-                    <Link
-                      href={ROUTES.profil}
-                      className="text-lg font-medium text-muted-foreground hover:text-primary"
-                    >
-                      Mon profil
-                    </Link>
-                  </>
-                ) : (
-                  <Link
-                    href={ROUTES.login}
-                    className="text-lg font-medium text-primary"
-                  >
-                    Connexion
-                  </Link>
-                )}
-              </nav>
-            </SheetContent>
-          </Sheet>
+                  )}
+                </nav>
+              </SheetContent>
+            </Sheet>
+          ) : (
+            <Button variant="ghost" size="icon" className="md:hidden">
+              <Menu className="h-5 w-5" />
+              <span className="sr-only">Menu</span>
+            </Button>
+          )}
         </div>
       </div>
     </header>

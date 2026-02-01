@@ -19,7 +19,6 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import {
   Dialog,
   DialogContent,
@@ -28,9 +27,11 @@ import {
 } from '@/components/ui/dialog';
 import { SafeImage } from '@/components/shared/safe-image';
 import { useCartStore } from '@/stores/cart-store';
+import { useDeliveryAddressStore } from '@/stores/delivery-address-store';
 import { useAuth } from '@/hooks/use-auth';
 import { formatPrice } from '@/lib/utils';
 import { ROUTES, PAYMENT_METHODS } from '@/lib/constants';
+import { AddressPickerScreen } from '@/components/checkout/address-picker-screen';
 import {
   createOrder,
   initiatePayment,
@@ -96,10 +97,12 @@ export default function NouvelleCommandePage() {
     clear,
   } = useCartStore();
 
+  // Get delivery address from shared store
+  const deliveryAddressStore = useDeliveryAddressStore();
+
   const [checkoutState, setCheckoutState] = useState<CheckoutState>({ type: 'idle' });
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('wave');
-  const [deliveryAddress, setDeliveryAddress] = useState('');
-  const [deliveryNote, setDeliveryNote] = useState('');
+  const [isAddressPickerOpen, setIsAddressPickerOpen] = useState(false);
   const [customerPhone, setCustomerPhone] = useState('');
   const [promoCode, setPromoCode] = useState('');
   const [promoDiscount, setPromoDiscount] = useState(0);
@@ -226,23 +229,21 @@ export default function NouvelleCommandePage() {
     setCustomerPhone(formatPhoneInput(e.target.value));
   };
 
+  // Check if address is valid
+  const hasValidAddress = deliveryAddressStore.hasAddress() && deliveryAddressStore.isZoneCovered;
+
   // Validate form
   const isFormValid = useCallback(() => {
-    if (!deliveryAddress.trim()) return false;
-    if (!deliveryNote.trim()) return false;
+    if (!hasValidAddress) return false;
     if (isPhoneRequired && customerPhone.length < 9) return false;
     return true;
-  }, [deliveryAddress, deliveryNote, isPhoneRequired, customerPhone]);
+  }, [hasValidAddress, isPhoneRequired, customerPhone]);
 
   // Handle checkout submission
   const handleSubmit = async () => {
     if (!isFormValid()) {
-      if (!deliveryAddress.trim()) {
-        setCheckoutState({ type: 'error', message: 'Veuillez entrer une adresse de livraison' });
-        return;
-      }
-      if (!deliveryNote.trim()) {
-        setCheckoutState({ type: 'error', message: 'Veuillez entrer un point de repère ou des instructions pour le livreur' });
+      if (!hasValidAddress) {
+        setIsAddressPickerOpen(true);
         return;
       }
       if (isPhoneRequired && customerPhone.length < 9) {
@@ -260,10 +261,12 @@ export default function NouvelleCommandePage() {
     setCheckoutState({ type: 'loading' });
 
     const orderItems = cartItemsToOrderItems(items);
-    // Keep address and instructions separate to avoid duplication
+    // Build delivery address from store
     const deliveryAddressData = {
-      formattedAddress: deliveryAddress,
-      additionalInfo: deliveryNote || undefined,
+      formattedAddress: deliveryAddressStore.getFullAddress(),
+      latitude: deliveryAddressStore.latitude || undefined,
+      longitude: deliveryAddressStore.longitude || undefined,
+      additionalInfo: deliveryAddressStore.additionalInfo || undefined,
     };
 
     try {
@@ -458,42 +461,51 @@ export default function NouvelleCommandePage() {
 
       <div className="container py-4 space-y-4">
         {/* Delivery Address */}
-        <Card className="p-4 space-y-3">
-          <div className="flex items-center gap-2">
-            <MapPin className="h-5 w-5 text-primary" />
-            <h3 className="font-semibold">Adresse de livraison</h3>
-          </div>
-          <div className="space-y-2">
-            <div>
-              <Label htmlFor="address" className="text-sm text-muted-foreground">
-                Adresse complète <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="address"
-                placeholder="Ex: Sacré Coeur 3, Villa 123"
-                value={deliveryAddress}
-                onChange={(e) => setDeliveryAddress(e.target.value)}
-                className={!deliveryAddress.trim() && checkoutState.type === 'error' ? 'border-red-500' : ''}
-              />
+        <Card
+          className="p-4 cursor-pointer hover:bg-gray-50 transition-colors"
+          onClick={() => setIsAddressPickerOpen(true)}
+        >
+          <div className="flex items-center gap-3">
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+              hasValidAddress ? 'bg-primary/10' : 'bg-orange-100'
+            }`}>
+              {hasValidAddress ? (
+                <MapPin className="h-5 w-5 text-primary" />
+              ) : (
+                <AlertCircle className="h-5 w-5 text-orange-600" />
+              )}
             </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm text-muted-foreground">Adresse de livraison</p>
+              {hasValidAddress ? (
+                <>
+                  <p className="font-medium truncate">{deliveryAddressStore.getFullAddress()}</p>
+                  {deliveryAddressStore.additionalInfo && (
+                    <p className="text-xs text-muted-foreground truncate mt-0.5">
+                      {deliveryAddressStore.additionalInfo}
+                    </p>
+                  )}
+                </>
+              ) : (
+                <p className="font-medium text-orange-600">Sélectionner une adresse</p>
+              )}
+            </div>
+            <ChevronLeft className="h-5 w-5 text-muted-foreground rotate-180 flex-shrink-0" />
+          </div>
+        </Card>
+
+        {/* Zone not covered warning */}
+        {deliveryAddressStore.hasAddress() && !deliveryAddressStore.isZoneCovered && (
+          <div className="flex items-start gap-3 p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
+            <AlertCircle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
             <div>
-              <Label htmlFor="instructions" className="text-sm text-muted-foreground">
-                Point de repère / Instructions <span className="text-red-500">*</span>
-              </Label>
-              <Textarea
-                id="instructions"
-                placeholder="Ex: À côté de la pharmacie, portail bleu..."
-                value={deliveryNote}
-                onChange={(e) => setDeliveryNote(e.target.value)}
-                rows={2}
-                className={!deliveryNote.trim() && checkoutState.type === 'error' ? 'border-red-500' : ''}
-              />
+              <p className="text-sm font-medium text-destructive">Zone non couverte</p>
               <p className="text-xs text-muted-foreground mt-1">
-                Aidez le livreur à vous trouver facilement
+                L&apos;adresse sélectionnée n&apos;est pas dans notre zone de livraison.
               </p>
             </div>
           </div>
-        </Card>
+        )}
 
         {/* Order Summary */}
         <Card className="p-4 space-y-3">
@@ -751,7 +763,7 @@ export default function NouvelleCommandePage() {
             <Loader2 className="h-16 w-16 animate-spin text-primary mb-6" />
             <h2 className="text-xl font-bold text-gray-900 mb-2">En attente de paiement</h2>
             <p className="text-muted-foreground text-center mb-6">
-              Veuillez compléter votre paiement dans la fenêtre qui s'est ouverte.
+              Veuillez compléter votre paiement dans la fenêtre qui s&apos;est ouverte.
             </p>
             <Button
               variant="outline"
@@ -771,6 +783,12 @@ export default function NouvelleCommandePage() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Address Picker Dialog */}
+      <AddressPickerScreen
+        open={isAddressPickerOpen}
+        onOpenChange={setIsAddressPickerOpen}
+      />
     </div>
   );
 }
