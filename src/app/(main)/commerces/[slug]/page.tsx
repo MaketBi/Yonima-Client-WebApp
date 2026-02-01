@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const title = `${vendor.name} - Livraison à Dakar | ${APP_NAME}`;
   const description = vendor.description ||
     `Commandez chez ${vendor.name} et faites-vous livrer rapidement à Dakar. Produits et prix sur ${APP_NAME}.`;
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://yonima.sn';
+  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://www.poulzz.store';
 
   return {
     title,

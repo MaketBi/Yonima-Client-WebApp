@@ -1,7 +1,7 @@
 import { APP_NAME } from "@/lib/constants";
 import type { Vendor, Product } from "@/types/models";
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://yonima.sn";
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || "https://www.poulzz.store";
 
 interface JsonLdProps {
   data: Record<string, unknown>;

@@ -1,7 +1,7 @@
 import { MetadataRoute } from "next";
 import { createServerClient } from "@/lib/supabase/server";
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://yonima.sn";
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || "https://www.poulzz.store";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const supabase = await createServerClient();

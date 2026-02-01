@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const title = `${pack.name} | ${vendor.name} | ${APP_NAME}`;
   const description = `${pack.price.toLocaleString('fr-FR')} ${CURRENCY} - Commandez sur ${APP_NAME}`;
   const ogDescription = `${pack.price.toLocaleString('fr-FR')} ${CURRENCY} chez ${vendor.name}`;
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://yonima.sn';
+  const siteUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://www.poulzz.store';
 
   return {
     title,
