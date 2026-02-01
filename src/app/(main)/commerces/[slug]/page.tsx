@@ -2,13 +2,12 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 import { getVendor, getVendorCategories, getVendorProducts, getVendorPacks } from '@/actions/catalog';
-import { EstablishmentHeader } from '@/components/establishment/establishment-header';
-import { CategoryNav } from '@/components/product/category-nav';
-import { ProductList } from '@/components/product/product-list';
+import { EstablishmentHeaderMobile } from '@/components/establishment/establishment-header-mobile';
+import { CategoryTabs } from '@/components/product/category-tabs';
+import { ProductGrid } from '@/components/product/product-grid';
 import { PackList } from '@/components/product/pack-list';
 import { RestaurantJsonLd, BreadcrumbJsonLd } from '@/components/seo';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { APP_NAME } from '@/lib/constants';
 
 interface Props {
@@ -60,34 +59,35 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 function ProductsSkeleton() {
   return (
-    <div className="space-y-3">
-      {[...Array(5)].map((_, i) => (
-        <div key={i} className="flex gap-3 rounded-lg overflow-hidden border">
-          <Skeleton className="w-28 h-28" />
-          <div className="flex-1 p-3 space-y-2">
-            <Skeleton className="h-5 w-3/4" />
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-1/4" />
-          </div>
+    <div className="px-4 space-y-8">
+      <div>
+        <Skeleton className="h-6 w-32 mb-4" />
+        <div className="grid grid-cols-2 gap-3">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="space-y-2">
+              <Skeleton className="aspect-square rounded-xl" />
+              <Skeleton className="h-4 w-3/4" />
+              <Skeleton className="h-4 w-1/2" />
+            </div>
+          ))}
         </div>
-      ))}
+      </div>
     </div>
   );
 }
 
 async function CommerceContent({ slug }: { slug: string }) {
-  const [vendor, categories, products, packs] = await Promise.all([
-    getVendor(slug),
-    getVendor(slug).then((v) => (v ? getVendorCategories(v.id) : [])),
-    getVendor(slug).then((v) => (v ? getVendorProducts(v.id) : [])),
-    getVendor(slug).then((v) => (v ? getVendorPacks(v.id) : [])),
-  ]);
+  const vendor = await getVendor(slug);
 
   if (!vendor) {
     notFound();
   }
 
-  const hasPacks = packs.length > 0;
+  const [categories, products, packs] = await Promise.all([
+    getVendorCategories(vendor.id),
+    getVendorProducts(vendor.id),
+    getVendorPacks(vendor.id),
+  ]);
 
   const breadcrumbs = [
     { name: 'Accueil', url: '/' },
@@ -95,54 +95,49 @@ async function CommerceContent({ slug }: { slug: string }) {
     { name: vendor.name, url: `/commerces/${vendor.slug}` },
   ];
 
+  // If there are packs, add them as a virtual category
+  const allCategories = packs.length > 0
+    ? [...categories, { id: 'packs', name: `Packs (${packs.length})`, vendor_id: vendor.id, slug: 'packs', description: null, image_url: null, sort_order: 999, is_active: true, created_at: '' }]
+    : categories;
+
   return (
-    <div>
+    <div className="min-h-screen bg-background pb-20">
       <RestaurantJsonLd vendor={vendor} />
       <BreadcrumbJsonLd items={breadcrumbs} />
-      <EstablishmentHeader establishment={vendor} />
 
-      {hasPacks ? (
-        <Tabs defaultValue="produits" className="mt-4">
-          <div className="container">
-            <TabsList className="w-full justify-start">
-              <TabsTrigger value="produits">Produits</TabsTrigger>
-              <TabsTrigger value="packs">Packs ({packs.length})</TabsTrigger>
-            </TabsList>
-          </div>
+      {/* Mobile Header */}
+      <EstablishmentHeaderMobile establishment={vendor} />
 
-          <TabsContent value="produits" className="mt-0">
-            {categories.length > 0 && <CategoryNav categories={categories} />}
-            <div className="container py-4">
-              <ProductList
-                products={products}
-                categories={categories}
-                vendorId={vendor.id}
-                vendor={vendor}
-                emptyMessage="Aucun produit disponible pour le moment."
-              />
-            </div>
-          </TabsContent>
+      {/* Category Tabs */}
+      {allCategories.length > 0 && (
+        <CategoryTabs categories={allCategories} />
+      )}
 
-          <TabsContent value="packs" className="mt-0">
-            <div className="container py-4">
+      {/* Products Grid */}
+      <div className="py-4">
+        <ProductGrid
+          products={products}
+          categories={categories}
+          vendorId={vendor.id}
+          vendor={vendor}
+          emptyMessage="Aucun produit disponible pour le moment."
+        />
+
+        {/* Packs Section */}
+        {packs.length > 0 && (
+          <div className="mt-8">
+            <h2
+              className="text-lg font-semibold mb-4 px-4"
+              id="category-packs"
+            >
+              Packs ({packs.length})
+            </h2>
+            <div className="px-4">
               <PackList packs={packs} vendorId={vendor.id} vendor={vendor} />
             </div>
-          </TabsContent>
-        </Tabs>
-      ) : (
-        <>
-          {categories.length > 0 && <CategoryNav categories={categories} />}
-          <div className="container py-4">
-            <ProductList
-              products={products}
-              categories={categories}
-              vendorId={vendor.id}
-              vendor={vendor}
-              emptyMessage="Aucun produit disponible pour le moment."
-            />
           </div>
-        </>
-      )}
+        )}
+      </div>
     </div>
   );
 }
@@ -153,9 +148,26 @@ export default async function CommerceDetailPage({ params }: Props) {
   return (
     <Suspense
       fallback={
-        <div>
-          <Skeleton className="h-48 md:h-64 w-full" />
-          <div className="container py-4">
+        <div className="min-h-screen bg-background">
+          <div className="sticky top-0 z-50 bg-background border-b">
+            <div className="flex items-center gap-3 px-4 py-3">
+              <Skeleton className="h-9 w-9 rounded-full" />
+              <Skeleton className="h-10 w-10 rounded-full" />
+              <div className="flex-1">
+                <Skeleton className="h-5 w-32 mb-1" />
+                <Skeleton className="h-3 w-24" />
+              </div>
+              <Skeleton className="h-9 w-9 rounded-full" />
+            </div>
+          </div>
+          <div className="sticky top-[60px] z-40 bg-background border-b">
+            <div className="flex gap-2 px-4 py-3">
+              <Skeleton className="h-9 w-28 rounded-full" />
+              <Skeleton className="h-9 w-24 rounded-full" />
+              <Skeleton className="h-9 w-20 rounded-full" />
+            </div>
+          </div>
+          <div className="py-4">
             <ProductsSkeleton />
           </div>
         </div>

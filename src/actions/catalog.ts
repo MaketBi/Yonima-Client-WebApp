@@ -94,26 +94,27 @@ export async function getVendor(slugOrId: string): Promise<Vendor | null> {
 }
 
 /**
- * Get categories for a vendor
+ * Get categories for a vendor from vendor_categories table
  */
-export async function getVendorCategories(vendorId: string): Promise<Category[]> {
+export async function getVendorCategories(vendorId: string): Promise<VendorCategory[]> {
   try {
     const supabase = await createServerClient();
     const { data, error } = await supabase
-      .from('categories')
+      .from('vendor_categories')
       .select('*')
       .eq('vendor_id', vendorId)
       .eq('is_active', true)
+      .order('sort_order', { ascending: true })
       .order('name', { ascending: true });
 
     if (error) {
-      console.error('Error fetching categories:', error);
+      console.error('Error fetching vendor categories:', error);
       return [];
     }
 
-    return data as Category[];
+    return data as VendorCategory[];
   } catch (error) {
-    console.error('Error fetching categories:', error);
+    console.error('Error fetching vendor categories:', error);
     return [];
   }
 }
@@ -140,7 +141,7 @@ export async function getVendorProducts(
       .order('popularity_score', { ascending: false });
 
     if (options?.categoryId) {
-      query = query.eq('category_id', options.categoryId);
+      query = query.eq('vendor_category_id', options.categoryId);
     }
 
     if (options?.search) {

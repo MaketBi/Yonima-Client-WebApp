@@ -1,24 +1,23 @@
 'use client';
 
 import { useRef, useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import type { VendorCategory } from '@/types/models';
 
-interface CategoryNavProps {
+interface CategoryTabsProps {
   categories: VendorCategory[];
   activeCategory?: string;
   onCategoryChange?: (categoryId: string) => void;
   className?: string;
 }
 
-export function CategoryNav({
+export function CategoryTabs({
   categories,
   activeCategory,
   onCategoryChange,
   className,
-}: CategoryNavProps) {
+}: CategoryTabsProps) {
   const [active, setActive] = useState(activeCategory || categories[0]?.id);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -35,7 +34,7 @@ export function CategoryNav({
     // Scroll to category section
     const element = document.getElementById(`category-${categoryId}`);
     if (element) {
-      const headerOffset = 140; // Header height + nav height
+      const headerOffset = 120; // Header height + tabs height
       const elementPosition = element.getBoundingClientRect().top;
       const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
 
@@ -51,22 +50,25 @@ export function CategoryNav({
   }
 
   return (
-    <div className={cn('sticky top-16 z-40 bg-background border-b', className)}>
+    <div className={cn('sticky top-[60px] z-40 bg-background border-b', className)}>
       <ScrollArea className="w-full">
-        <div ref={containerRef} className="flex gap-2 p-3">
+        <div ref={containerRef} className="flex gap-2 px-4 py-3">
           {categories.map((category) => (
-            <Button
+            <button
               key={category.id}
-              variant={active === category.id ? 'default' : 'outline'}
-              size="sm"
-              className="shrink-0"
               onClick={() => handleCategoryClick(category.id)}
+              className={cn(
+                'shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-colors',
+                active === category.id
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-muted text-muted-foreground hover:bg-muted/80'
+              )}
             >
               {category.name}
-            </Button>
+            </button>
           ))}
         </div>
-        <ScrollBar orientation="horizontal" />
+        <ScrollBar orientation="horizontal" className="invisible" />
       </ScrollArea>
     </div>
   );

@@ -1,11 +1,11 @@
 'use client';
 
-import { ProductCard } from './product-card';
+import { ProductCardGrid } from './product-card-grid';
 import { EmptyState } from '@/components/shared/empty-state';
 import { Package } from 'lucide-react';
 import type { Product, VendorCategory, Vendor } from '@/types/models';
 
-interface ProductListProps {
+interface ProductGridProps {
   products: Product[];
   categories?: VendorCategory[];
   vendorId: string;
@@ -14,14 +14,14 @@ interface ProductListProps {
   emptyMessage?: string;
 }
 
-export function ProductList({
+export function ProductGrid({
   products,
   categories,
   vendorId,
   vendor,
   onProductClick,
   emptyMessage,
-}: ProductListProps) {
+}: ProductGridProps) {
   if (products.length === 0) {
     return (
       <EmptyState
@@ -45,15 +45,18 @@ export function ProductList({
     );
 
     return (
-      <div className="space-y-6">
+      <div className="space-y-8">
         {productsByCategory.map(({ category, products: categoryProducts }) => (
           <div key={category.id}>
-            <h2 className="text-lg font-semibold mb-3" id={`category-${category.id}`}>
+            <h2
+              className="text-lg font-semibold mb-4 px-4"
+              id={`category-${category.id}`}
+            >
               {category.name}
             </h2>
-            <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-3 px-4">
               {categoryProducts.map((product) => (
-                <ProductCard
+                <ProductCardGrid
                   key={product.id}
                   product={product}
                   vendorId={vendorId}
@@ -67,10 +70,10 @@ export function ProductList({
 
         {uncategorizedProducts.length > 0 && (
           <div>
-            <h2 className="text-lg font-semibold mb-3">Autres</h2>
-            <div className="space-y-3">
+            <h2 className="text-lg font-semibold mb-4 px-4">Autres</h2>
+            <div className="grid grid-cols-2 gap-3 px-4">
               {uncategorizedProducts.map((product) => (
-                <ProductCard
+                <ProductCardGrid
                   key={product.id}
                   product={product}
                   vendorId={vendorId}
@@ -85,11 +88,11 @@ export function ProductList({
     );
   }
 
-  // Simple list without categories
+  // Simple grid without categories
   return (
-    <div className="space-y-3">
+    <div className="grid grid-cols-2 gap-3 px-4">
       {products.map((product) => (
-        <ProductCard
+        <ProductCardGrid
           key={product.id}
           product={product}
           vendorId={vendorId}
