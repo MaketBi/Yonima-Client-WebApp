@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/use-auth';
 import { useCartItemCount } from '@/stores/cart-store';
+import { useUnreadNotificationsCount } from '@/hooks/use-realtime';
 import { APP_NAME, ROUTES } from '@/lib/constants';
 
 const navLinks = [
@@ -23,6 +24,7 @@ export function Header() {
   const pathname = usePathname();
   const { user, isAuthenticated, isLoading } = useAuth();
   const cartItemCount = useCartItemCount();
+  const unreadNotificationsCount = useUnreadNotificationsCount(user?.id || null);
   const [mounted, setMounted] = useState(false);
 
   // Avoid hydration mismatch
@@ -71,6 +73,14 @@ export function Header() {
             <Button variant="ghost" size="icon" asChild className="relative">
               <Link href={ROUTES.notifications}>
                 <Bell className="h-5 w-5" />
+                {unreadNotificationsCount > 0 && (
+                  <Badge
+                    variant="destructive"
+                    className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
+                  >
+                    {unreadNotificationsCount > 9 ? '9+' : unreadNotificationsCount}
+                  </Badge>
+                )}
                 <span className="sr-only">Notifications</span>
               </Link>
             </Button>
