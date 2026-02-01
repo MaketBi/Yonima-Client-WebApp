@@ -6,6 +6,8 @@ import { EstablishmentHeaderMobile } from '@/components/establishment/establishm
 import { CategoryTabs } from '@/components/product/category-tabs';
 import { ProductGrid } from '@/components/product/product-grid';
 import { PackList } from '@/components/product/pack-list';
+import { ProductModal } from '@/components/product/product-modal';
+import { PackModal } from '@/components/product/pack-modal';
 import { RestaurantJsonLd, BreadcrumbJsonLd } from '@/components/seo';
 import { Skeleton } from '@/components/ui/skeleton';
 import { APP_NAME } from '@/lib/constants';
@@ -24,9 +26,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
-  const title = `${vendor.name} - Livraison à Dakar`;
+  const title = `${vendor.name} - Livraison à Dakar | ${APP_NAME}`;
   const description = vendor.description ||
     `Commandez chez ${vendor.name} et faites-vous livrer rapidement à Dakar. Menu, prix et avis sur ${APP_NAME}.`;
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://yonima.sn';
 
   return {
     title,
@@ -40,9 +43,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       ...(vendor.tags || []),
     ].filter(Boolean),
     openGraph: {
-      title,
+      title: vendor.name,
       description,
       type: 'website',
+      siteName: APP_NAME,
+      url: `${siteUrl}/restaurants/${vendor.slug}`,
       images: vendor.cover_image_url ? [
         {
           url: vendor.cover_image_url,
@@ -54,7 +59,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
     twitter: {
       card: 'summary_large_image',
-      title,
+      title: vendor.name,
       description,
       images: vendor.cover_image_url ? [vendor.cover_image_url] : [],
     },
@@ -150,6 +155,10 @@ async function RestaurantContent({ slug }: { slug: string }) {
           </div>
         )}
       </div>
+
+      {/* Modals for deep linking */}
+      <ProductModal products={products} vendor={vendor} basePath="/restaurants" />
+      <PackModal packs={packs} vendor={vendor} basePath="/restaurants" />
     </div>
   );
 }
