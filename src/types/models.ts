@@ -205,7 +205,7 @@ export type OrderStatus =
   | 'delivered'
   | 'cancelled';
 
-export type PaymentMethod = 'cash' | 'wave' | 'orange_money' | 'card';
+export type PaymentMethod = 'wave' | 'orange_money' | 'cash';
 export type PaymentStatus = 'pending' | 'paid' | 'failed' | 'refunded';
 
 export interface Order {

@@ -63,13 +63,15 @@ export const ORDER_STATUS_COLORS: Record<string, string> = {
   cancelled: 'bg-red-100 text-red-800',
 };
 
-// Payment methods
+// Payment methods (Wave, Orange Money, Cash - pas de carte bancaire)
 export const PAYMENT_METHODS = {
-  cash: { label: 'Espèces', icon: 'Banknote' },
-  wave: { label: 'Wave', icon: 'Smartphone' },
-  orange_money: { label: 'Orange Money', icon: 'Smartphone' },
-  card: { label: 'Carte bancaire', icon: 'CreditCard' },
+  wave: { label: 'Wave', color: '#1BA0E1' },
+  orange_money: { label: 'Orange Money', color: '#FF6600' },
+  cash: { label: 'Espèces', color: '#22C55E' },
 } as const;
+
+// Payment method type (without card)
+export type PaymentMethodType = keyof typeof PAYMENT_METHODS;
 
 // Days of week (French)
 export const DAYS_OF_WEEK = [
@@ -113,4 +115,6 @@ export const API_ENDPOINTS = {
   simpleVerify: '/functions/v1/simple-verify',
   validatePromo: '/functions/v1/validate-promo',
   createOrder: '/functions/v1/create-order',
+  mobilePayment: '/functions/v1/mobile-payment',
+  checkPaymentStatus: '/functions/v1/check-payment-status',
 } as const;
