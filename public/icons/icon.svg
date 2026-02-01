@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="64" fill="#1DB88E"/>
+  <g fill="#ffffff">
+    <!-- Lettre Y stylisée représentant Yonima -->
+    <path d="M256 100 L180 220 L180 380 Q180 400 200 400 L220 400 Q240 400 240 380 L240 280 L256 250 L272 280 L272 380 Q272 400 292 400 L312 400 Q332 400 332 380 L332 220 L256 100 Z"/>
+    <!-- Point sous le Y pour symboliser la livraison/destination -->
+    <circle cx="256" cy="440" r="24"/>
+  </g>
+</svg>

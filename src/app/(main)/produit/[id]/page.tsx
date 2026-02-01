@@ -9,6 +9,9 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ProductActions } from '@/components/product/product-actions';
+import { ProductJsonLd, BreadcrumbJsonLd } from '@/components/seo';
+import { APP_NAME } from '@/lib/constants';
+import { formatPrice } from '@/lib/utils';
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -24,10 +27,35 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
+  const vendorInfo = (product as any).vendor;
+  const vendorName = vendorInfo?.name || '';
+  const priceText = formatPrice(product.price);
+
+  const title = `${product.name}${vendorName ? ` - ${vendorName}` : ''} | ${APP_NAME}`;
+  const description = product.description ||
+    `${product.name} à ${priceText}. Commandez et faites-vous livrer rapidement à Dakar sur ${APP_NAME}.`;
+
   return {
-    title: product.name,
-    description: product.description || `Commandez ${product.name} sur Yonima`,
+    title,
+    description,
+    keywords: [product.name, vendorName, 'livraison', 'Dakar', 'commande'].filter(Boolean),
     openGraph: {
+      title,
+      description,
+      type: 'website',
+      images: product.image_url ? [
+        {
+          url: product.image_url,
+          width: 800,
+          height: 800,
+          alt: product.name,
+        },
+      ] : [],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
       images: product.image_url ? [product.image_url] : [],
     },
   };
@@ -57,8 +85,17 @@ async function ProductContent({ id }: { id: string }) {
   const vendorInfo = (product as any).vendor;
   const isAvailable = product.is_available && product.is_active;
 
+  const breadcrumbs = [
+    { name: 'Accueil', url: '/' },
+    ...(vendorInfo ? [{ name: vendorInfo.name, url: `/restaurants/${vendorInfo.id}` }] : []),
+    { name: product.name, url: `/produit/${product.id}` },
+  ];
+
   return (
     <div className="pb-24">
+      <ProductJsonLd product={product} vendor={vendorInfo} />
+      <BreadcrumbJsonLd items={breadcrumbs} />
+
       {/* Back button */}
       <div className="container py-4">
         <Button variant="ghost" size="sm" asChild>

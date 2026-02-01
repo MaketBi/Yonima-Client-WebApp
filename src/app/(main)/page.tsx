@@ -7,6 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { SafeImage } from '@/components/shared/safe-image';
 import { LocationPickerButton } from '@/components/shared/location-picker-button';
+import { OrganizationJsonLd, WebSiteJsonLd } from '@/components/seo';
 import { ROUTES } from '@/lib/constants';
 import { getVendorsByType } from '@/actions/catalog';
 import { formatPrice } from '@/lib/utils';
@@ -141,6 +142,9 @@ async function CommercesSection() {
 export default function HomePage() {
   return (
     <div className="pb-6">
+      <OrganizationJsonLd />
+      <WebSiteJsonLd />
+
       {/* Location Header - Mobile style */}
       <div className="container py-4 flex items-center justify-between">
         <LocationPickerButton />

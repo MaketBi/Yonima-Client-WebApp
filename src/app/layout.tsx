@@ -3,6 +3,8 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { APP_NAME } from "@/lib/constants";
+import { ServiceWorkerRegistration } from "@/components/pwa/service-worker-registration";
+import { AnalyticsProvider } from "@/components/analytics";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -23,6 +25,15 @@ export const metadata: Metadata = {
   description: "Commandez vos repas et courses préférés et faites-vous livrer rapidement à Dakar. Restaurants, commerces et épicerie à portée de main.",
   keywords: ["livraison", "Dakar", "restaurant", "épicerie", "courses", "Sénégal"],
   authors: [{ name: APP_NAME }],
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: APP_NAME,
+  },
+  formatDetection: {
+    telephone: true,
+  },
   openGraph: {
     type: "website",
     locale: "fr_SN",
@@ -38,6 +49,17 @@ export const metadata: Metadata = {
   robots: {
     index: true,
     follow: true,
+  },
+  icons: {
+    icon: [
+      { url: "/icons/icon.svg", type: "image/svg+xml" },
+      { url: "/icons/icon-192x192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/icon-512x512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [
+      { url: "/icons/icon-152x152.png", sizes: "152x152", type: "image/png" },
+      { url: "/icons/icon-192x192.png", sizes: "192x192", type: "image/png" },
+    ],
   },
 };
 
@@ -63,6 +85,8 @@ export default function RootLayout({
       >
         {children}
         <Toaster />
+        <ServiceWorkerRegistration />
+        <AnalyticsProvider />
       </body>
     </html>
   );

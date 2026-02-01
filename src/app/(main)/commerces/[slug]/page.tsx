@@ -6,8 +6,10 @@ import { EstablishmentHeader } from '@/components/establishment/establishment-he
 import { CategoryNav } from '@/components/product/category-nav';
 import { ProductList } from '@/components/product/product-list';
 import { PackList } from '@/components/product/pack-list';
+import { RestaurantJsonLd, BreadcrumbJsonLd } from '@/components/seo';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { APP_NAME } from '@/lib/constants';
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -23,11 +25,35 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
+  const title = `${vendor.name} - Livraison à Dakar`;
+  const description = vendor.description ||
+    `Commandez chez ${vendor.name} et faites-vous livrer rapidement à Dakar. Produits et prix sur ${APP_NAME}.`;
+
   return {
-    title: vendor.name,
-    description: vendor.description || `Commandez chez ${vendor.name} sur Yonima`,
+    title,
+    description,
+    keywords: [vendor.name, 'livraison', 'Dakar', 'commerce', 'commande en ligne'],
     openGraph: {
+      title,
+      description,
+      type: 'website',
+      images: vendor.cover_image_url ? [
+        {
+          url: vendor.cover_image_url,
+          width: 1200,
+          height: 630,
+          alt: vendor.name,
+        },
+      ] : [],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
       images: vendor.cover_image_url ? [vendor.cover_image_url] : [],
+    },
+    alternates: {
+      canonical: `/commerces/${vendor.slug}`,
     },
   };
 }
@@ -63,8 +89,16 @@ async function CommerceContent({ slug }: { slug: string }) {
 
   const hasPacks = packs.length > 0;
 
+  const breadcrumbs = [
+    { name: 'Accueil', url: '/' },
+    { name: 'Commerces', url: '/commerces' },
+    { name: vendor.name, url: `/commerces/${vendor.slug}` },
+  ];
+
   return (
     <div>
+      <RestaurantJsonLd vendor={vendor} />
+      <BreadcrumbJsonLd items={breadcrumbs} />
       <EstablishmentHeader establishment={vendor} />
 
       {hasPacks ? (

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ChevronLeft, Minus, Plus, Trash2, ShoppingBag, MapPin, PlusCircle, ChevronRight, AlertTriangle } from 'lucide-react';
@@ -10,6 +10,7 @@ import { SafeImage } from '@/components/shared/safe-image';
 import { useCartStore } from '@/stores/cart-store';
 import { useDeliveryAddressStore } from '@/stores/delivery-address-store';
 import { useAuth } from '@/hooks/use-auth';
+import { useAnalytics } from '@/hooks/use-analytics';
 import { formatPrice } from '@/lib/utils';
 import { ROUTES } from '@/lib/constants';
 import { AddressPickerScreen } from '@/components/checkout/address-picker-screen';
@@ -42,9 +43,26 @@ export default function PanierPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isAddressPickerOpen, setIsAddressPickerOpen] = useState(false);
 
+  const { trackCartView, trackCartRemove, trackCheckoutStart } = useAnalytics();
+
   const subtotal = getSubtotal();
   const deliveryFee = getDeliveryFee();
   const total = getTotal();
+
+  // Track cart view on mount
+  useEffect(() => {
+    if (items.length > 0) {
+      trackCartView(
+        items.map((item) => ({
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+        })),
+        total
+      );
+    }
+  }, []);
 
   // Get the URL to add more items from the same establishment
   const getEstablishmentUrl = () => {
@@ -76,6 +94,16 @@ export default function PanierPage() {
     return getFullAddress();
   };
 
+  const handleRemoveItem = (item: typeof items[0]) => {
+    trackCartRemove({
+      id: item.id,
+      name: item.name,
+      price: item.price,
+      quantity: item.quantity,
+    });
+    removeItem(item.id);
+  };
+
   const handleCheckout = async () => {
     if (!user) {
       router.push(ROUTES.login);
@@ -87,6 +115,17 @@ export default function PanierPage() {
       setIsAddressPickerOpen(true);
       return;
     }
+
+    // Track checkout initiation
+    trackCheckoutStart(
+      items.map((item) => ({
+        id: item.id,
+        name: item.name,
+        price: item.price,
+        quantity: item.quantity,
+      })),
+      total
+    );
 
     setIsProcessing(true);
     router.push('/commandes/nouveau');
@@ -205,7 +244,7 @@ export default function PanierPage() {
                   variant="ghost"
                   size="sm"
                   className="text-destructive hover:text-destructive h-8 px-2"
-                  onClick={() => removeItem(item.id)}
+                  onClick={() => handleRemoveItem(item)}
                 >
                   <Trash2 className="h-4 w-4 mr-1" />
                   Supprimer

@@ -2,11 +2,21 @@ import { Metadata } from 'next';
 import { Suspense } from 'react';
 import { getVendorsByType } from '@/actions/catalog';
 import { EstablishmentList } from '@/components/establishment/establishment-list';
+import { BreadcrumbJsonLd } from '@/components/seo';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export const metadata: Metadata = {
-  title: 'Commerces',
-  description: 'Découvrez les commerces de Dakar et faites-vous livrer rapidement.',
+  title: 'Commerces à Dakar - Livraison rapide',
+  description: 'Découvrez les commerces de Dakar et faites-vous livrer rapidement vos achats. Yonima livre tout à Dakar.',
+  keywords: ['commerces', 'Dakar', 'livraison', 'boutiques', 'shopping', 'achats'],
+  openGraph: {
+    title: 'Commerces à Dakar - Livraison rapide | Yonima',
+    description: 'Découvrez les commerces de Dakar et faites-vous livrer rapidement vos achats.',
+    type: 'website',
+  },
+  alternates: {
+    canonical: '/commerces',
+  },
 };
 
 function CommercesSkeleton() {
@@ -38,9 +48,16 @@ async function CommercesContent() {
   );
 }
 
+const breadcrumbs = [
+  { name: 'Accueil', url: '/' },
+  { name: 'Commerces', url: '/commerces' },
+];
+
 export default function CommercesPage() {
   return (
     <div className="container py-6">
+      <BreadcrumbJsonLd items={breadcrumbs} />
+
       <div className="mb-6">
         <h1 className="text-2xl font-bold">Commerces</h1>
         <p className="text-muted-foreground">

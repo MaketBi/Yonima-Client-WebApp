@@ -7,11 +7,21 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SafeImage } from '@/components/shared/safe-image';
+import { BreadcrumbJsonLd } from '@/components/seo';
 import { ROUTES } from '@/lib/constants';
 
 export const metadata: Metadata = {
-  title: 'Épicerie en ligne',
-  description: 'Faites vos courses en ligne et recevez-les rapidement à Dakar.',
+  title: 'Épicerie en ligne à Dakar - Livraison rapide',
+  description: 'Faites vos courses en ligne et recevez-les rapidement à Dakar. Fruits, légumes, produits frais et bien plus. Livraison en 10-15 minutes avec Yonima.',
+  keywords: ['épicerie', 'courses en ligne', 'Dakar', 'livraison rapide', 'fruits', 'légumes', 'supermarché'],
+  openGraph: {
+    title: 'Épicerie en ligne à Dakar - Livraison rapide | Yonima',
+    description: 'Faites vos courses en ligne et recevez-les rapidement à Dakar.',
+    type: 'website',
+  },
+  alternates: {
+    canonical: '/epicerie',
+  },
 };
 
 function CategoriesSkeleton() {
@@ -66,9 +76,16 @@ async function GroceryCategoriesContent() {
   );
 }
 
+const breadcrumbs = [
+  { name: 'Accueil', url: '/' },
+  { name: 'Épicerie', url: '/epicerie' },
+];
+
 export default function EpiceriePage() {
   return (
     <div className="min-h-screen bg-background">
+      <BreadcrumbJsonLd items={breadcrumbs} />
+
       {/* Header */}
       <div className="sticky top-0 z-50 bg-background border-b">
         <div className="container flex items-center justify-between h-14">

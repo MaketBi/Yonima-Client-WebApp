@@ -2,11 +2,21 @@ import { Metadata } from 'next';
 import { Suspense } from 'react';
 import { getVendorsByType } from '@/actions/catalog';
 import { EstablishmentList } from '@/components/establishment/establishment-list';
+import { BreadcrumbJsonLd } from '@/components/seo';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export const metadata: Metadata = {
-  title: 'Restaurants',
-  description: 'Découvrez les meilleurs restaurants de Dakar et commandez vos plats préférés.',
+  title: 'Restaurants à Dakar - Livraison rapide',
+  description: 'Découvrez les meilleurs restaurants de Dakar et commandez vos plats préférés. Livraison rapide avec Yonima.',
+  keywords: ['restaurants', 'Dakar', 'livraison', 'commande en ligne', 'plats', 'cuisine sénégalaise'],
+  openGraph: {
+    title: 'Restaurants à Dakar - Livraison rapide | Yonima',
+    description: 'Découvrez les meilleurs restaurants de Dakar et commandez vos plats préférés.',
+    type: 'website',
+  },
+  alternates: {
+    canonical: '/restaurants',
+  },
 };
 
 function RestaurantsSkeleton() {
@@ -38,9 +48,16 @@ async function RestaurantsContent() {
   );
 }
 
+const breadcrumbs = [
+  { name: 'Accueil', url: '/' },
+  { name: 'Restaurants', url: '/restaurants' },
+];
+
 export default function RestaurantsPage() {
   return (
     <div className="container py-6">
+      <BreadcrumbJsonLd items={breadcrumbs} />
+
       <div className="mb-6">
         <h1 className="text-2xl font-bold">Restaurants</h1>
         <p className="text-muted-foreground">

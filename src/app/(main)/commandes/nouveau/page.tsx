@@ -29,6 +29,7 @@ import { SafeImage } from '@/components/shared/safe-image';
 import { useCartStore } from '@/stores/cart-store';
 import { useDeliveryAddressStore } from '@/stores/delivery-address-store';
 import { useAuth } from '@/hooks/use-auth';
+import { useAnalytics } from '@/hooks/use-analytics';
 import { formatPrice } from '@/lib/utils';
 import { ROUTES, PAYMENT_METHODS } from '@/lib/constants';
 import { AddressPickerScreen } from '@/components/checkout/address-picker-screen';
@@ -99,6 +100,8 @@ export default function NouvelleCommandePage() {
 
   // Get delivery address from shared store
   const deliveryAddressStore = useDeliveryAddressStore();
+
+  const { trackPaymentMethod, trackDeliveryInfo, trackOrder } = useAnalytics();
 
   const [checkoutState, setCheckoutState] = useState<CheckoutState>({ type: 'idle' });
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('wave');
@@ -285,6 +288,21 @@ export default function NouvelleCommandePage() {
         });
 
         if (result.success && result.order_id && result.order_number) {
+          // Track successful order
+          trackOrder({
+            orderId: result.order_id,
+            total,
+            subtotal,
+            deliveryFee,
+            paymentMethod: 'cash',
+            items: items.map((item) => ({
+              id: item.id,
+              name: item.name,
+              price: item.price,
+              quantity: item.quantity,
+            })),
+          });
+
           // Set success state BEFORE clearing cart to prevent redirect
           setCheckoutState({
             type: 'success',
@@ -329,6 +347,21 @@ export default function NouvelleCommandePage() {
           // Check for sandbox instant payment
           if (result.instant_payment && result.order_id && result.order_number) {
             console.log('[Checkout] Sandbox instant payment - order created');
+            // Track successful order
+            trackOrder({
+              orderId: result.order_id,
+              total,
+              subtotal,
+              deliveryFee,
+              paymentMethod,
+              items: items.map((item) => ({
+                id: item.id,
+                name: item.name,
+                price: item.price,
+                quantity: item.quantity,
+              })),
+            });
+
             // Set success state BEFORE clearing cart to prevent redirect
             setCheckoutState({
               type: 'success',
@@ -569,7 +602,10 @@ export default function NouvelleCommandePage() {
                   ? 'border-[#1BA0E1] bg-[#1BA0E1]/5'
                   : 'border-gray-200 hover:border-gray-300'
               }`}
-              onClick={() => setPaymentMethod('wave')}
+              onClick={() => {
+                setPaymentMethod('wave');
+                trackPaymentMethod('wave', total);
+              }}
             >
               <WaveIcon />
               <span className={`text-sm font-medium ${paymentMethod === 'wave' ? 'text-[#1BA0E1]' : ''}`}>
@@ -588,7 +624,10 @@ export default function NouvelleCommandePage() {
                   ? 'border-[#FF6600] bg-[#FF6600]/5'
                   : 'border-gray-200 hover:border-gray-300'
               }`}
-              onClick={() => setPaymentMethod('orange_money')}
+              onClick={() => {
+                setPaymentMethod('orange_money');
+                trackPaymentMethod('orange_money', total);
+              }}
             >
               <OrangeMoneyIcon />
               <span className={`text-sm font-medium ${paymentMethod === 'orange_money' ? 'text-[#FF6600]' : ''}`}>
@@ -604,7 +643,10 @@ export default function NouvelleCommandePage() {
                   ? 'border-green-500 bg-green-50'
                   : 'border-gray-200 hover:border-gray-300'
               }`}
-              onClick={() => setPaymentMethod('cash')}
+              onClick={() => {
+                setPaymentMethod('cash');
+                trackPaymentMethod('cash', total);
+              }}
             >
               <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center">
                 <Banknote className="h-4 w-4 text-white" />
