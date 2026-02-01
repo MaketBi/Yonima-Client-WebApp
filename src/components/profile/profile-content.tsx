@@ -16,6 +16,7 @@ import {
   FileText,
   Loader2,
   MapPin,
+  MessageSquare,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -57,6 +58,12 @@ const menuItems = [
     icon: Heart,
     label: 'Ma fidélité',
     description: 'Points et récompenses',
+  },
+  {
+    href: '/profil/avis',
+    icon: MessageSquare,
+    label: 'Mes avis',
+    description: 'Évaluer mes commandes',
   },
   {
     href: ROUTES.notifications,
