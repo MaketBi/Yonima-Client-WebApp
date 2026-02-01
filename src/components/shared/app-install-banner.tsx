@@ -49,9 +49,11 @@ export function AppInstallBanner() {
     const androidAppUrl = process.env.NEXT_PUBLIC_ANDROID_APP_URL;
 
     if (platform === 'ios') {
-      return iosAppUrl || '#';
+      // TestFlight or App Store URL
+      return iosAppUrl || 'https://apps.apple.com/app/poulzz';
     }
-    return androidAppUrl || '#';
+    // Play Store URL
+    return androidAppUrl || 'https://play.google.com/store/apps/details?id=com.poulzz.app';
   };
 
   const getStoreName = () => {
