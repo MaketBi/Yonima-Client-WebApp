@@ -63,9 +63,9 @@ function ProductsSkeleton() {
       <div>
         <Skeleton className="h-6 w-32 mb-4" />
         <div className="grid grid-cols-2 gap-3">
-          {[...Array(4)].map((_, i) => (
+          {[...Array(6)].map((_, i) => (
             <div key={i} className="space-y-2">
-              <Skeleton className="aspect-square rounded-xl" />
+              <Skeleton className="h-32 sm:h-36 rounded-xl" />
               <Skeleton className="h-4 w-3/4" />
               <Skeleton className="h-4 w-1/2" />
             </div>
@@ -95,10 +95,15 @@ async function CommerceContent({ slug }: { slug: string }) {
     { name: vendor.name, url: `/commerces/${vendor.slug}` },
   ];
 
+  // Filter categories that have products
+  const categoriesWithProducts = categories.filter(
+    (cat) => products.some((p) => p.vendor_category_id === cat.id)
+  );
+
   // If there are packs, add them as a virtual category
   const allCategories = packs.length > 0
-    ? [...categories, { id: 'packs', name: `Packs (${packs.length})`, vendor_id: vendor.id, slug: 'packs', description: null, image_url: null, sort_order: 999, is_active: true, created_at: '' }]
-    : categories;
+    ? [...categoriesWithProducts, { id: 'packs', name: `Packs (${packs.length})`, vendor_id: vendor.id, slug: 'packs', description: null, image_url: null, sort_order: 999, is_active: true, created_at: '' }]
+    : categoriesWithProducts;
 
   return (
     <div className="min-h-screen bg-background pb-20">
@@ -117,7 +122,7 @@ async function CommerceContent({ slug }: { slug: string }) {
       <div className="py-4">
         <ProductGrid
           products={products}
-          categories={categories}
+          categories={categoriesWithProducts}
           vendorId={vendor.id}
           vendor={vendor}
           emptyMessage="Aucun produit disponible pour le moment."

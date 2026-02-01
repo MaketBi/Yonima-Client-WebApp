@@ -59,19 +59,19 @@ export function ProductCardGrid({ product, vendorId, vendor, onClick, className 
       )}
       onClick={onClick}
     >
-      {/* Image Container */}
-      <div className="relative aspect-square rounded-xl overflow-hidden bg-muted mb-2">
+      {/* Image Container - fixed height for consistent sizing */}
+      <div className="relative h-32 sm:h-36 rounded-xl overflow-hidden bg-muted mb-2">
         {product.image_url ? (
           <Image
             src={product.image_url}
             alt={product.name}
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-200"
-            sizes="(max-width: 768px) 50vw, 33vw"
+            sizes="(max-width: 640px) 45vw, (max-width: 768px) 30vw, 20vw"
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-4xl">🍽️</span>
+            <span className="text-3xl">🍽️</span>
           </div>
         )}
 
@@ -80,15 +80,15 @@ export function ProductCardGrid({ product, vendorId, vendor, onClick, className 
           <Button
             size="icon"
             className={cn(
-              'absolute bottom-2 right-2 h-9 w-9 rounded-full shadow-lg',
+              'absolute bottom-1.5 right-1.5 h-8 w-8 rounded-full shadow-lg',
               quantity > 0 ? 'bg-primary' : 'bg-white text-primary hover:bg-white/90'
             )}
             onClick={handleAddToCart}
           >
             {quantity > 0 ? (
-              <span className="text-sm font-bold">{quantity}</span>
+              <span className="text-xs font-bold">{quantity}</span>
             ) : (
-              <Plus className="h-5 w-5" />
+              <Plus className="h-4 w-4" />
             )}
           </Button>
         )}
@@ -96,7 +96,7 @@ export function ProductCardGrid({ product, vendorId, vendor, onClick, className 
         {/* Unavailable overlay */}
         {!isAvailable && (
           <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-            <span className="text-white text-sm font-medium bg-black/60 px-3 py-1 rounded-full">
+            <span className="text-white text-xs font-medium bg-black/60 px-2 py-0.5 rounded-full">
               Indisponible
             </span>
           </div>
