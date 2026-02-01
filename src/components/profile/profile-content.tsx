@@ -15,6 +15,7 @@ import {
   HelpCircle,
   FileText,
   Loader2,
+  MapPin,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -44,6 +45,12 @@ const menuItems = [
     icon: ShoppingBag,
     label: 'Mes commandes',
     description: 'Historique et suivi',
+  },
+  {
+    href: '/profil/adresses',
+    icon: MapPin,
+    label: 'Mes adresses',
+    description: 'Adresses de livraison',
   },
   {
     href: ROUTES.fidelite,
