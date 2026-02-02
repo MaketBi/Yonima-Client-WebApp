@@ -6,7 +6,8 @@
         "appID": "UTS8DR2455.sn.yonima.app",
         "paths": [
           "/restaurants/*",
-          "/commerces/*"
+          "/commerces/*",
+          "/epicerie/*"
         ]
       }
     ]
