@@ -58,7 +58,7 @@ export function DeepLinkRedirect() {
       }, 2000);
     } else if (isAndroid) {
       // Android: Use intent URL for better app detection
-      const packageName = 'com.poulzz.app';
+      const packageName = 'com.yonima.client';
       const fallbackUrl = window.location.href;
 
       // Build Android intent URL

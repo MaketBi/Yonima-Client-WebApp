@@ -3,9 +3,9 @@
     "relation": ["delegate_permission/common.handle_all_urls"],
     "target": {
       "namespace": "android_app",
-      "package_name": "com.poulzz.app",
+      "package_name": "com.yonima.client",
       "sha256_cert_fingerprints": [
-        "REPLACE_WITH_YOUR_SHA256_FINGERPRINT"
+        "99:26:7A:85:97:97:56:7A:9B:56:A0:C6:72:24:1E:3E:A1:8E:4F:E5:0E:09:EE:39:F6:34:3E:F7:F3:6B:82:74"
       ]
     }
   }
