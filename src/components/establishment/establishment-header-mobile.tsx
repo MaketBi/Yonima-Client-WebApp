@@ -7,7 +7,7 @@ import { ChevronLeft, ShoppingCart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useCartItemCount } from '@/stores/cart-store';
-import { formatPrice } from '@/lib/utils';
+import { formatPrice, isVendorOpen } from '@/lib/utils';
 import type { Vendor } from '@/types/models';
 
 interface EstablishmentHeaderMobileProps {
@@ -17,6 +17,7 @@ interface EstablishmentHeaderMobileProps {
 export function EstablishmentHeaderMobile({ establishment }: EstablishmentHeaderMobileProps) {
   const router = useRouter();
   const cartItemCount = useCartItemCount();
+  const isOpen = establishment.is_open && isVendorOpen(establishment.opening_hours);
 
   return (
     <div className="sticky top-0 z-50 bg-background border-b">
@@ -49,7 +50,14 @@ export function EstablishmentHeaderMobile({ establishment }: EstablishmentHeader
 
         {/* Name and Info */}
         <div className="flex-1 min-w-0">
-          <h1 className="font-semibold text-base truncate">{establishment.name}</h1>
+          <div className="flex items-center gap-2">
+            <h1 className="font-semibold text-base truncate">{establishment.name}</h1>
+            {!isOpen && (
+              <Badge variant="destructive" className="shrink-0 text-xs px-2 py-0.5">
+                Fermé
+              </Badge>
+            )}
+          </div>
           <p className="text-xs text-muted-foreground">
             {establishment.estimated_time || '20-30 min'} • {formatPrice(establishment.delivery_fee)}
           </p>
