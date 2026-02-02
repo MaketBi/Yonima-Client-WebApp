@@ -5,6 +5,7 @@ import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useCartStore } from '@/stores/cart-store';
+import { useCart } from '@/providers/cart-provider';
 import { CURRENCY } from '@/lib/constants';
 import type { Product, Vendor } from '@/types/models';
 
@@ -17,7 +18,8 @@ interface ProductCardGridProps {
 }
 
 export function ProductCardGrid({ product, vendorId, vendor, onClick, className }: ProductCardGridProps) {
-  const { items, addItem, canAddFromEstablishment } = useCartStore();
+  const { items } = useCartStore();
+  const { addToCart } = useCart();
 
   const cartItem = items.find((item) => item.id === product.id && item.type === 'product');
   const quantity = cartItem?.quantity || 0;
@@ -25,11 +27,7 @@ export function ProductCardGrid({ product, vendorId, vendor, onClick, className 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation();
 
-    if (!canAddFromEstablishment(vendorId)) {
-      return;
-    }
-
-    addItem(
+    addToCart(
       {
         id: product.id,
         type: 'product',
@@ -47,7 +45,7 @@ export function ProductCardGrid({ product, vendorId, vendor, onClick, className 
   const isAvailable = product.is_available && product.is_active;
 
   const formatPriceLocal = (price: number) => {
-    return `${price.toLocaleString('fr-FR')} F ${CURRENCY}`;
+    return `${price.toLocaleString('fr-FR')} ${CURRENCY}`;
   };
 
   return (

@@ -4,6 +4,7 @@ import { Plus, Minus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PriceDisplay } from '@/components/shared/price-display';
 import { useCartStore } from '@/stores/cart-store';
+import { useCart } from '@/providers/cart-provider';
 import type { Product, Vendor } from '@/types/models';
 
 interface ProductActionsProps {
@@ -13,18 +14,14 @@ interface ProductActionsProps {
 }
 
 export function ProductActions({ product, vendorId, vendor }: ProductActionsProps) {
-  const { items, addItem, updateQuantity, removeItem, canAddFromEstablishment } = useCartStore();
+  const { items, updateQuantity, removeItem } = useCartStore();
+  const { addToCart } = useCart();
 
   const cartItem = items.find((item) => item.id === product.id && item.type === 'product');
   const quantity = cartItem?.quantity || 0;
 
   const handleAddToCart = () => {
-    if (!canAddFromEstablishment(vendorId)) {
-      // TODO: Show dialog to clear cart
-      return;
-    }
-
-    addItem(
+    addToCart(
       {
         id: product.id,
         type: 'product',

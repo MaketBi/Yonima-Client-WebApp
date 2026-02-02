@@ -6,6 +6,7 @@ import { Card } from '@/components/ui/card';
 import { SafeImage } from '@/components/shared/safe-image';
 import { formatPrice } from '@/lib/utils';
 import { useCartStore } from '@/stores/cart-store';
+import { useCart } from '@/providers/cart-provider';
 import type { Product, Vendor } from '@/types/models';
 
 interface GroceryProductCardProps {
@@ -15,7 +16,8 @@ interface GroceryProductCardProps {
 }
 
 export function GroceryProductCard({ product, vendorId, vendor }: GroceryProductCardProps) {
-  const { items, addItem, updateQuantity, removeItem, canAddFromEstablishment } = useCartStore();
+  const { items, updateQuantity, removeItem } = useCartStore();
+  const { addToCart } = useCart();
 
   const cartItem = items.find((item) => item.id === product.id && item.type === 'product');
   const quantity = cartItem?.quantity || 0;
@@ -24,12 +26,7 @@ export function GroceryProductCard({ product, vendorId, vendor }: GroceryProduct
     e.preventDefault();
     e.stopPropagation();
 
-    if (!canAddFromEstablishment(vendorId)) {
-      // TODO: Show dialog to clear cart
-      return;
-    }
-
-    addItem(
+    addToCart(
       {
         id: product.id,
         type: 'product',

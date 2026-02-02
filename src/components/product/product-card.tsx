@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { PriceDisplay } from '@/components/shared/price-display';
 import { cn } from '@/lib/utils';
 import { useCartStore } from '@/stores/cart-store';
+import { useCart } from '@/providers/cart-provider';
 import type { Product, Vendor } from '@/types/models';
 
 interface ProductCardProps {
@@ -19,7 +20,8 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, vendorId, vendor, onClick, className }: ProductCardProps) {
-  const { items, addItem, updateQuantity, removeItem, canAddFromEstablishment } = useCartStore();
+  const { items, updateQuantity, removeItem } = useCartStore();
+  const { addToCart } = useCart();
 
   const cartItem = items.find((item) => item.id === product.id && item.type === 'product');
   const quantity = cartItem?.quantity || 0;
@@ -27,12 +29,7 @@ export function ProductCard({ product, vendorId, vendor, onClick, className }: P
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation();
 
-    if (!canAddFromEstablishment(vendorId)) {
-      // TODO: Show dialog to clear cart
-      return;
-    }
-
-    addItem(
+    addToCart(
       {
         id: product.id,
         type: 'product',

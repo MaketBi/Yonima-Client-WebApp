@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { useCartStore } from '@/stores/cart-store';
+import { useCart } from '@/providers/cart-provider';
 import { useToast } from '@/hooks/use-toast';
 import { CURRENCY } from '@/lib/constants';
 import type { Pack, Vendor } from '@/types/models';
@@ -26,7 +27,8 @@ export function PackModal({ packs, vendor, basePath }: PackModalProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
-  const { items, addItem, updateQuantity, removeItem, canAddFromEstablishment } = useCartStore();
+  const { items, updateQuantity, removeItem } = useCartStore();
+  const { addToCart } = useCart();
 
   const [isOpen, setIsOpen] = useState(false);
   const [pack, setPack] = useState<Pack | null>(null);
@@ -67,11 +69,7 @@ export function PackModal({ packs, vendor, basePath }: PackModalProps) {
   const handleAddToCart = () => {
     if (!pack) return;
 
-    if (!canAddFromEstablishment(vendor.id)) {
-      return;
-    }
-
-    addItem(
+    addToCart(
       {
         id: pack.id,
         type: 'pack',

@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { PriceDisplay } from '@/components/shared/price-display';
 import { cn } from '@/lib/utils';
 import { useCartStore } from '@/stores/cart-store';
+import { useCart } from '@/providers/cart-provider';
 import type { Pack, Vendor } from '@/types/models';
 
 interface PackCardProps {
@@ -20,7 +21,8 @@ interface PackCardProps {
 }
 
 export function PackCard({ pack, vendorId, vendor, showVendor, className }: PackCardProps) {
-  const { items, addItem, updateQuantity, removeItem, canAddFromEstablishment } = useCartStore();
+  const { items, updateQuantity, removeItem } = useCartStore();
+  const { addToCart } = useCart();
 
   const cartItem = items.find((item) => item.id === pack.id && item.type === 'pack');
   const quantity = cartItem?.quantity || 0;
@@ -29,12 +31,7 @@ export function PackCard({ pack, vendorId, vendor, showVendor, className }: Pack
     e.preventDefault();
     e.stopPropagation();
 
-    if (!canAddFromEstablishment(vendorId)) {
-      // TODO: Show dialog to clear cart
-      return;
-    }
-
-    addItem(
+    addToCart(
       {
         id: pack.id,
         type: 'pack',
