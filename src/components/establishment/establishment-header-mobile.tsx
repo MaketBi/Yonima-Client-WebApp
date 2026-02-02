@@ -1,12 +1,10 @@
 'use client';
 
 import Image from 'next/image';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ChevronLeft, ShoppingCart } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { useCartItemCount } from '@/stores/cart-store';
 import { formatPrice, isVendorOpen } from '@/lib/utils';
 import type { Vendor } from '@/types/models';
 
@@ -16,7 +14,6 @@ interface EstablishmentHeaderMobileProps {
 
 export function EstablishmentHeaderMobile({ establishment }: EstablishmentHeaderMobileProps) {
   const router = useRouter();
-  const cartItemCount = useCartItemCount();
   const isOpen = establishment.is_open && isVendorOpen(establishment.opening_hours);
 
   return (
@@ -62,25 +59,6 @@ export function EstablishmentHeaderMobile({ establishment }: EstablishmentHeader
             {establishment.estimated_time || '20-30 min'} • {formatPrice(establishment.delivery_fee)}
           </p>
         </div>
-
-        {/* Cart Button */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-9 w-9 rounded-full shrink-0 relative"
-          asChild
-        >
-          <Link href="/panier">
-            <ShoppingCart className="h-5 w-5" />
-            {cartItemCount > 0 && (
-              <Badge
-                className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
-              >
-                {cartItemCount > 9 ? '9+' : cartItemCount}
-              </Badge>
-            )}
-          </Link>
-        </Button>
       </div>
     </div>
   );
