@@ -7,7 +7,9 @@ import { Plus, Minus, X, Package, Share2 } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
+  SheetTitle,
 } from '@/components/ui/sheet';
+import * as VisuallyHidden from '@radix-ui/react-visually-hidden';
 import { Button } from '@/components/ui/button';
 import { useCartStore } from '@/stores/cart-store';
 import { useCart } from '@/providers/cart-provider';
@@ -141,6 +143,9 @@ export function PackModal({ packs, vendor, basePath }: PackModalProps) {
   return (
     <Sheet open={isOpen} onOpenChange={(open) => !open && handleClose()}>
       <SheetContent side="bottom" className="h-[90vh] rounded-t-3xl p-0 overflow-hidden">
+        <VisuallyHidden.Root>
+          <SheetTitle>{pack.name}</SheetTitle>
+        </VisuallyHidden.Root>
         <div className="flex flex-col h-full">
           {/* Header buttons */}
           <div className="absolute top-4 left-4 right-4 z-10 flex justify-between">
