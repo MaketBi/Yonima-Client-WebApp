@@ -7,7 +7,7 @@
         "paths": [
           "/restaurants/*",
           "/commerces/*",
-          "/epicerie/*"
+          "/epiceries/*"
         ]
       }
     ]
