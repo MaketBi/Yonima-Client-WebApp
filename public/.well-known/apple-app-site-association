@@ -3,7 +3,7 @@
     "apps": [],
     "details": [
       {
-        "appID": "UTS8DR2455.sn.yonima.app",
+        "appID": "UTS8DR2455.com.yonima.client",
         "paths": [
           "/restaurants/*",
           "/commerces/*",
