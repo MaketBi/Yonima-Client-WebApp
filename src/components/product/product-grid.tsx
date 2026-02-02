@@ -10,7 +10,6 @@ interface ProductGridProps {
   categories?: VendorCategory[];
   vendorId: string;
   vendor?: Vendor;
-  onProductClick?: (product: Product) => void;
   emptyMessage?: string;
 }
 
@@ -19,7 +18,6 @@ export function ProductGrid({
   categories,
   vendorId,
   vendor,
-  onProductClick,
   emptyMessage,
 }: ProductGridProps) {
   if (products.length === 0) {
@@ -61,7 +59,6 @@ export function ProductGrid({
                   product={product}
                   vendorId={vendorId}
                   vendor={vendor}
-                  onClick={() => onProductClick?.(product)}
                 />
               ))}
             </div>
@@ -78,7 +75,6 @@ export function ProductGrid({
                   product={product}
                   vendorId={vendorId}
                   vendor={vendor}
-                  onClick={() => onProductClick?.(product)}
                 />
               ))}
             </div>
@@ -97,7 +93,6 @@ export function ProductGrid({
           product={product}
           vendorId={vendorId}
           vendor={vendor}
-          onClick={() => onProductClick?.(product)}
         />
       ))}
     </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import { useRouter, usePathname } from 'next/navigation';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -13,11 +14,12 @@ interface ProductCardGridProps {
   product: Product;
   vendorId: string;
   vendor?: Vendor;
-  onClick?: () => void;
   className?: string;
 }
 
-export function ProductCardGrid({ product, vendorId, vendor, onClick, className }: ProductCardGridProps) {
+export function ProductCardGrid({ product, vendorId, vendor, className }: ProductCardGridProps) {
+  const router = useRouter();
+  const pathname = usePathname();
   const { items } = useCartStore();
   const { addToCart } = useCart();
 
@@ -48,6 +50,11 @@ export function ProductCardGrid({ product, vendorId, vendor, onClick, className 
     return `${price.toLocaleString('fr-FR')} ${CURRENCY}`;
   };
 
+  const handleClick = () => {
+    // Navigate to open the product modal via URL param
+    router.push(`${pathname}?produit=${product.id}`, { scroll: false });
+  };
+
   return (
     <div
       className={cn(
@@ -55,7 +62,7 @@ export function ProductCardGrid({ product, vendorId, vendor, onClick, className 
         !isAvailable && 'opacity-60',
         className
       )}
-      onClick={onClick}
+      onClick={handleClick}
     >
       {/* Image Container - fixed height for consistent sizing */}
       <div className="relative h-32 sm:h-36 rounded-xl overflow-hidden bg-muted mb-2">
