@@ -3,21 +3,12 @@
     "apps": [],
     "details": [
       {
-        "appID": "TEAM_ID.com.poulzz.app",
+        "appID": "UTS8DR2455.sn.yonima.app",
         "paths": [
           "/restaurants/*",
-          "/commerces/*",
-          "/produit/*",
-          "/pack/*",
-          "/commande/*",
-          "/panier"
+          "/commerces/*"
         ]
       }
-    ]
-  },
-  "webcredentials": {
-    "apps": [
-      "TEAM_ID.com.poulzz.app"
     ]
   }
 }
