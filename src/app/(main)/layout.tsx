@@ -18,8 +18,12 @@ export default function MainLayout({
       <Header />
       <main className="flex-1 pb-16 md:pb-0">{children}</main>
       <Footer />
-      <BottomNav />
-      <AppInstallBanner />
+      <Suspense fallback={null}>
+        <BottomNav />
+      </Suspense>
+      <Suspense fallback={null}>
+        <AppInstallBanner />
+      </Suspense>
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { Suspense } from 'react';
 import { ChevronRight, Clock, Bike, ShoppingBasket, Utensils, Store } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -32,32 +33,43 @@ function VendorsSkeleton() {
   );
 }
 
-function VendorCard({ vendor, href }: { vendor: Vendor; href: string }) {
+function VendorCard({ vendor, href, priority = false }: { vendor: Vendor; href: string; priority?: boolean }) {
   return (
     <Link href={href} className="w-[280px] shrink-0">
       <Card className="overflow-hidden border-0 shadow-sm">
         <div className="relative aspect-[4/3] bg-muted">
-          <SafeImage
-            src={vendor.cover_image_url || ''}
-            alt={vendor.name}
-            fill
-            className="object-cover"
-            sizes="280px"
-            fallback={<span className="text-4xl">🏪</span>}
-            fallbackClassName="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-50"
-          />
+          {priority && vendor.cover_image_url ? (
+            <Image
+              src={vendor.cover_image_url}
+              alt={vendor.name}
+              fill
+              className="object-cover"
+              sizes="280px"
+              priority
+            />
+          ) : (
+            <SafeImage
+              src={vendor.cover_image_url || ''}
+              alt={vendor.name}
+              fill
+              className="object-cover"
+              sizes="280px"
+              fallback={<span className="text-4xl">🏪</span>}
+              fallbackClassName="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-50"
+            />
+          )}
         </div>
         <CardContent className="p-3">
           <h3 className="font-semibold line-clamp-1">{vendor.name}</h3>
           <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground">
             {vendor.estimated_time && (
               <span className="flex items-center gap-1">
-                <Clock className="h-3.5 w-3.5 text-primary" />
+                <Clock className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
                 {vendor.estimated_time}
               </span>
             )}
             <span className="flex items-center gap-1">
-              <Bike className="h-3.5 w-3.5 text-primary" />
+              <Bike className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
               {vendor.delivery_fee > 0 ? formatPrice(vendor.delivery_fee) : 'Gratuit'}
             </span>
           </div>
@@ -78,22 +90,23 @@ async function RestaurantsSection() {
     <section>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <Utensils className="h-5 w-5 text-primary" />
+          <Utensils className="h-5 w-5 text-primary" aria-hidden="true" />
           <h2 className="text-xl font-semibold">Restaurants</h2>
         </div>
         <Button variant="outline" size="icon" className="rounded-full h-9 w-9" asChild>
-          <Link href={ROUTES.restaurants}>
-            <ChevronRight className="h-5 w-5" />
+          <Link href={ROUTES.restaurants} aria-label="Voir tous les restaurants">
+            <ChevronRight className="h-5 w-5" aria-hidden="true" />
           </Link>
         </Button>
       </div>
       <ScrollArea className="w-full">
         <div className="flex gap-4 pb-4">
-          {restaurants.map((vendor) => (
+          {restaurants.map((vendor, index) => (
             <VendorCard
               key={vendor.id}
               vendor={vendor}
               href={`/restaurants/${vendor.slug || vendor.id}`}
+              priority={index === 0}
             />
           ))}
         </div>
@@ -114,12 +127,12 @@ async function CommercesSection() {
     <section>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <Store className="h-5 w-5 text-primary" />
+          <Store className="h-5 w-5 text-primary" aria-hidden="true" />
           <h2 className="text-xl font-semibold">Commerces</h2>
         </div>
         <Button variant="outline" size="icon" className="rounded-full h-9 w-9" asChild>
-          <Link href={ROUTES.commerces}>
-            <ChevronRight className="h-5 w-5" />
+          <Link href={ROUTES.commerces} aria-label="Voir tous les commerces">
+            <ChevronRight className="h-5 w-5" aria-hidden="true" />
           </Link>
         </Button>
       </div>
@@ -154,7 +167,7 @@ export default function HomePage() {
         {/* Épicerie Section */}
         <section>
           <div className="flex items-center gap-2 mb-4">
-            <ShoppingBasket className="h-5 w-5 text-primary" />
+            <ShoppingBasket className="h-5 w-5 text-primary" aria-hidden="true" />
             <h2 className="text-xl font-semibold">Épicerie</h2>
           </div>
           <Link href={ROUTES.epicerie}>
@@ -186,12 +199,12 @@ export default function HomePage() {
                 {/* Bottom info bar */}
                 <div className="bg-white px-4 py-3 flex items-center gap-4 text-sm text-muted-foreground">
                   <span className="flex items-center gap-1">
-                    <Clock className="h-4 w-4 text-primary" />
+                    <Clock className="h-4 w-4 text-primary" aria-hidden="true" />
                     10-15 min
                   </span>
-                  <span className="text-muted-foreground">•</span>
+                  <span className="text-muted-foreground" aria-hidden="true">•</span>
                   <span className="flex items-center gap-1">
-                    <Bike className="h-4 w-4 text-primary" />
+                    <Bike className="h-4 w-4 text-primary" aria-hidden="true" />
                     500F
                   </span>
                 </div>

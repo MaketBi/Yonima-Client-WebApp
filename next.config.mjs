@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Optimize images
   images: {
     remotePatterns: [
       {
@@ -23,7 +24,13 @@ const nextConfig = {
         hostname: 'res.cloudinary.com',
       },
     ],
+    // Use modern image formats
+    formats: ['image/avif', 'image/webp'],
   },
+  // Enable compression
+  compress: true,
+  // Optimize production builds
+  productionBrowserSourceMaps: false,
   async headers() {
     return [
       {

@@ -15,6 +15,7 @@ export function SafeImage({
   fallback,
   fallbackClassName,
   className,
+  loading = 'lazy',
   ...props
 }: SafeImageProps) {
   const [hasError, setHasError] = useState(false);
@@ -37,6 +38,7 @@ export function SafeImage({
       src={src}
       alt={alt}
       className={className}
+      loading={loading}
       onError={() => setHasError(true)}
       {...props}
     />
