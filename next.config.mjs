@@ -24,6 +24,30 @@ const nextConfig = {
       },
     ],
   },
+  async headers() {
+    return [
+      {
+        // Required for iOS Universal Links
+        source: '/.well-known/apple-app-site-association',
+        headers: [
+          {
+            key: 'Content-Type',
+            value: 'application/json',
+          },
+        ],
+      },
+      {
+        // Required for Android App Links
+        source: '/.well-known/assetlinks.json',
+        headers: [
+          {
+            key: 'Content-Type',
+            value: 'application/json',
+          },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;

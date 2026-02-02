@@ -1,0 +1,23 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "TEAM_ID.com.poulzz.app",
+        "paths": [
+          "/restaurants/*",
+          "/commerces/*",
+          "/produit/*",
+          "/pack/*",
+          "/commande/*",
+          "/panier"
+        ]
+      }
+    ]
+  },
+  "webcredentials": {
+    "apps": [
+      "TEAM_ID.com.poulzz.app"
+    ]
+  }
+}
