@@ -31,7 +31,7 @@ export function CartVendorDialog({
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent className="max-w-[320px] rounded-2xl">
         <AlertDialogHeader>
-          <AlertDialogTitle>Changer de boutique ?</AlertDialogTitle>
+          <AlertDialogTitle>Vider le panier ?</AlertDialogTitle>
           <AlertDialogDescription>
             Votre panier contient des articles de <span className="font-medium text-foreground">{currentVendorName}</span>.
           </AlertDialogDescription>
