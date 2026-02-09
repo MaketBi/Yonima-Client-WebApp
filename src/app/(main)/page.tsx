@@ -14,18 +14,15 @@ import { getVendorsByType } from '@/actions/catalog';
 import { formatPrice } from '@/lib/utils';
 import type { Vendor } from '@/types/models';
 
-// Icônes épicerie (émojis pour le moment, à remplacer par de vraies icônes)
-const groceryIcons = ['🥕', '🛒', '☕', '🥬', '🐟', '🧃'];
-
 function VendorsSkeleton() {
   return (
-    <div className="flex gap-4 overflow-hidden">
+    <div className="flex gap-3 overflow-hidden">
       {[1, 2, 3].map((i) => (
-        <div key={i} className="w-[280px] shrink-0">
-          <Skeleton className="aspect-[4/3] w-full rounded-xl" />
-          <div className="mt-3 space-y-2">
-            <Skeleton className="h-5 w-3/4" />
-            <Skeleton className="h-4 w-1/2" />
+        <div key={i} className="w-[65vw] md:w-[280px] shrink-0">
+          <Skeleton className="aspect-[2/1] w-full rounded-xl" />
+          <div className="mt-2 space-y-1.5">
+            <Skeleton className="h-4 w-3/4" />
+            <Skeleton className="h-3.5 w-1/2" />
           </div>
         </div>
       ))}
@@ -35,16 +32,16 @@ function VendorsSkeleton() {
 
 function VendorCard({ vendor, href, priority = false }: { vendor: Vendor; href: string; priority?: boolean }) {
   return (
-    <Link href={href} className="w-[280px] shrink-0">
-      <Card className="overflow-hidden border-0 shadow-sm">
-        <div className="relative aspect-[4/3] bg-muted">
+    <Link href={href} className="w-[65vw] md:w-[280px] shrink-0">
+      <Card className="overflow-hidden border-0 shadow-sm rounded-xl">
+        <div className="relative aspect-[2/1] bg-muted">
           {priority && vendor.cover_image_url ? (
             <Image
               src={vendor.cover_image_url}
               alt={vendor.name}
               fill
               className="object-cover"
-              sizes="280px"
+              sizes="(max-width: 768px) 65vw, 280px"
               priority
             />
           ) : (
@@ -53,23 +50,23 @@ function VendorCard({ vendor, href, priority = false }: { vendor: Vendor; href: 
               alt={vendor.name}
               fill
               className="object-cover"
-              sizes="280px"
+              sizes="(max-width: 768px) 65vw, 280px"
               fallback={<span className="text-4xl">🏪</span>}
               fallbackClassName="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-50"
             />
           )}
         </div>
-        <CardContent className="p-3">
-          <h3 className="font-semibold line-clamp-1">{vendor.name}</h3>
-          <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground">
+        <CardContent className="p-2.5">
+          <h3 className="font-semibold text-sm line-clamp-1">{vendor.name}</h3>
+          <div className="flex items-center gap-2 mt-0.5 text-xs text-muted-foreground">
             {vendor.estimated_time && (
               <span className="flex items-center gap-1">
-                <Clock className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
+                <Clock className="h-3 w-3 text-primary" aria-hidden="true" />
                 {vendor.estimated_time}
               </span>
             )}
             <span className="flex items-center gap-1">
-              <Bike className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
+              <Bike className="h-3 w-3 text-primary" aria-hidden="true" />
               {vendor.delivery_fee > 0 ? formatPrice(vendor.delivery_fee) : 'Gratuit'}
             </span>
           </div>
@@ -88,7 +85,7 @@ async function RestaurantsSection() {
 
   return (
     <section>
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
           <Utensils className="h-5 w-5 text-primary" aria-hidden="true" />
           <h2 className="text-xl font-semibold">Restaurants</h2>
@@ -100,7 +97,7 @@ async function RestaurantsSection() {
         </Button>
       </div>
       <ScrollArea className="w-full">
-        <div className="flex gap-4 pb-4">
+        <div className="flex gap-3 pb-3">
           {restaurants.map((vendor, index) => (
             <VendorCard
               key={vendor.id}
@@ -125,7 +122,7 @@ async function CommercesSection() {
 
   return (
     <section>
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
           <Store className="h-5 w-5 text-primary" aria-hidden="true" />
           <h2 className="text-xl font-semibold">Commerces</h2>
@@ -137,7 +134,7 @@ async function CommercesSection() {
         </Button>
       </div>
       <ScrollArea className="w-full">
-        <div className="flex gap-4 pb-4">
+        <div className="flex gap-3 pb-3">
           {commerces.map((vendor) => (
             <VendorCard
               key={vendor.id}
@@ -159,52 +156,40 @@ export default function HomePage() {
       <WebSiteJsonLd />
 
       {/* Location Header - Mobile style */}
-      <div className="container py-4 flex items-center justify-between">
+      <div className="container py-3 flex items-center justify-between">
         <LocationPickerButton />
       </div>
 
-      <div className="container space-y-8">
+      <div className="container space-y-5">
         {/* Épicerie Section */}
         <section>
-          <div className="flex items-center gap-2 mb-4">
+          <div className="flex items-center gap-2 mb-2">
             <ShoppingBasket className="h-5 w-5 text-primary" aria-hidden="true" />
             <h2 className="text-xl font-semibold">Épicerie</h2>
           </div>
           <Link href={ROUTES.epicerie}>
-            <Card className="overflow-hidden border-0 bg-green-50">
+            <Card className="overflow-hidden border-0 rounded-xl">
               <CardContent className="p-0">
-                <div className="relative p-6">
-                  {/* Time badge */}
-                  <div className="absolute top-4 right-4">
-                    <span className="bg-white/90 text-xs font-medium px-2 py-1 rounded">
-                      10-15 MIN
-                    </span>
-                  </div>
-
-                  {/* Grocery icons grid */}
-                  <div className="flex justify-center py-4">
-                    <div className="grid grid-cols-3 gap-6">
-                      {groceryIcons.map((icon, index) => (
-                        <div
-                          key={index}
-                          className="h-12 w-12 rounded-full bg-white/80 flex items-center justify-center text-2xl shadow-sm"
-                        >
-                          {icon}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+                <div className="relative aspect-[3/1]">
+                  <Image
+                    src="/Affiche1080x540.png"
+                    alt="Épicerie Yonima"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 720px"
+                    priority
+                  />
                 </div>
 
                 {/* Bottom info bar */}
-                <div className="bg-white px-4 py-3 flex items-center gap-4 text-sm text-muted-foreground">
+                <div className="px-3 py-2 flex items-center gap-3 text-xs text-muted-foreground">
                   <span className="flex items-center gap-1">
-                    <Clock className="h-4 w-4 text-primary" aria-hidden="true" />
+                    <Clock className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
                     10-15 min
                   </span>
                   <span className="text-muted-foreground" aria-hidden="true">•</span>
                   <span className="flex items-center gap-1">
-                    <Bike className="h-4 w-4 text-primary" aria-hidden="true" />
+                    <Bike className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
                     500F
                   </span>
                 </div>
