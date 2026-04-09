@@ -3,9 +3,10 @@
     "relation": ["delegate_permission/common.handle_all_urls"],
     "target": {
       "namespace": "android_app",
-      "package_name": "com.yonima.client",
+      "package_name": "com.poulzz.yonima.client",
       "sha256_cert_fingerprints": [
-        "99:26:7A:85:97:97:56:7A:9B:56:A0:C6:72:24:1E:3E:A1:8E:4F:E5:0E:09:EE:39:F6:34:3E:F7:F3:6B:82:74"
+        "76:24:1F:8C:65:4C:9D:32:4F:6B:0C:EA:05:64:3A:F8:13:99:3A:EE:6F:FA:FD:3A:5F:AD:A7:43:E4:A8:51:CA",
+        "C3:F8:E9:5C:96:13:90:EA:7C:F5:9B:9C:F7:F2:65:62:9C:C2:76:0E:FE:A0:3C:F5:54:4E:F6:FE:6F:61:58:6C"
       ]
     }
   }
