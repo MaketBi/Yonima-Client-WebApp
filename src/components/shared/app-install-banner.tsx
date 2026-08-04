@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { APP_NAME } from '@/lib/constants';
+import { APP_NAME, IOS_APP_URL, ANDROID_APP_URL } from '@/lib/constants';
 
 const STORAGE_KEY = 'app-banner-dismissed';
 const DISMISS_DURATION_DAYS = 7; // Show again after 7 days
@@ -45,15 +45,7 @@ export function AppInstallBanner() {
   };
 
   const getStoreLink = () => {
-    const iosAppUrl = process.env.NEXT_PUBLIC_IOS_APP_URL;
-    const androidAppUrl = process.env.NEXT_PUBLIC_ANDROID_APP_URL;
-
-    if (platform === 'ios') {
-      // TestFlight or App Store URL
-      return iosAppUrl || 'https://apps.apple.com/fr/app/yonima-plus/id6756845915';
-    }
-    // Play Store URL
-    return androidAppUrl || 'https://play.google.com/store/apps/details?id=com.poulzz.yonima.client&pcampaignid=web_share';
+    return platform === 'ios' ? IOS_APP_URL : ANDROID_APP_URL;
   };
 
   const getStoreName = () => {

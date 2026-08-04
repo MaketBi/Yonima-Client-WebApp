@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { APP_NAME, ROUTES } from '@/lib/constants';
+import { APP_NAME, ROUTES, IOS_APP_URL, ANDROID_APP_URL } from '@/lib/constants';
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
@@ -92,7 +92,7 @@ export function Footer() {
           </p>
           <div className="flex items-center space-x-4">
             <Link
-              href={process.env.NEXT_PUBLIC_IOS_APP_URL || '#'}
+              href={IOS_APP_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="text-sm text-muted-foreground hover:text-primary transition-colors"
@@ -100,7 +100,7 @@ export function Footer() {
               App Store
             </Link>
             <Link
-              href={process.env.NEXT_PUBLIC_ANDROID_APP_URL || '#'}
+              href={ANDROID_APP_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="text-sm text-muted-foreground hover:text-primary transition-colors"
