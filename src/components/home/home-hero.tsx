@@ -32,6 +32,10 @@ export function HomeHero() {
 
   return (
     <>
+      {/* H1 unique de la page d'accueil, masqué visuellement (le hero est purement visuel). */}
+      <h1 className="sr-only">
+        Yonima — Livraison rapide à Dakar : restaurants, commerces et épicerie
+      </h1>
       <div className="relative h-[196px] w-full overflow-hidden bg-neutral-200 md:h-[300px]">
         <Image
           src="/hero-food.jpg"

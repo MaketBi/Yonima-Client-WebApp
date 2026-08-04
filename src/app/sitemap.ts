@@ -10,7 +10,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const { data: vendors } = await supabase
     .from("vendors")
     .select("slug, type, updated_at")
-    .eq("is_active", true);
+    .eq("is_active", true)
+    .not("slug", "is", null);
 
   // Get all grocery categories
   const { data: groceryCategories } = await supabase
@@ -50,7 +51,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Vendor pages (restaurants and stores)
   const vendorPages: MetadataRoute.Sitemap =
-    vendors?.map((vendor) => {
+    vendors
+      ?.filter((vendor) => vendor.slug && vendor.slug.trim())
+      .map((vendor) => {
       const basePath = vendor.type === "restaurant" ? "restaurants" : "commerces";
       return {
         url: `${BASE_URL}/${basePath}/${vendor.slug}`,

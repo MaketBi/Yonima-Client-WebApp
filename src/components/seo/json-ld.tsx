@@ -35,7 +35,6 @@ export function OrganizationJsonLd() {
       name: "Dakar",
       "@id": "https://www.wikidata.org/wiki/Q3718",
     },
-    sameAs: [],
   };
 
   return <JsonLd data={data} />;

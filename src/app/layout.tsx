@@ -17,6 +17,7 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://www.poulzz.store"),
   title: {
     default: `${APP_NAME} - Livraison rapide à Dakar`,
     template: `%s | ${APP_NAME}`,
@@ -24,6 +25,9 @@ export const metadata: Metadata = {
   description: "Commandez vos repas et courses préférés et faites-vous livrer rapidement à Dakar. Restaurants, commerces et épicerie à portée de main.",
   keywords: ["livraison", "Dakar", "restaurant", "épicerie", "courses", "Sénégal"],
   authors: [{ name: APP_NAME }],
+  alternates: {
+    canonical: "/",
+  },
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
@@ -37,13 +41,23 @@ export const metadata: Metadata = {
     type: "website",
     locale: "fr_SN",
     siteName: APP_NAME,
+    url: "https://www.poulzz.store",
     title: `${APP_NAME} - Livraison rapide à Dakar`,
     description: "Commandez vos repas et courses préférés et faites-vous livrer rapidement à Dakar.",
+    images: [
+      {
+        url: "/icons/icon-512x512.png",
+        width: 512,
+        height: 512,
+        alt: APP_NAME,
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: `${APP_NAME} - Livraison rapide à Dakar`,
     description: "Commandez vos repas et courses préférés et faites-vous livrer rapidement à Dakar.",
+    images: ["/icons/icon-512x512.png"],
   },
   robots: {
     index: true,
