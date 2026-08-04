@@ -10,59 +10,92 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    /* ------------------------------------------------------------------ */
+    /* Yonima design system — shadcn variables mapped to the brand palette */
+    /* Source: Refonte/_ds/.../tokens/colors.css. Light-only system.       */
+    /* ------------------------------------------------------------------ */
+    --background: 210 40% 98%; /* #F8FAFC bg-page */
+    --foreground: 0 0% 10%; /* #1A1A1A ink */
+    --card: 0 0% 100%; /* #FFFFFF */
+    --card-foreground: 0 0% 10%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    /* Yonima brand color - Teal/Green */
-    --primary: 168 76% 42%;
+    --popover-foreground: 0 0% 10%;
+    /* Yonima signature green (forest) */
+    --primary: 133 39% 30%; /* #2E6A3B */
     --primary-foreground: 0 0% 100%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 40%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
+    --secondary: 150 21% 95%; /* #F1F4F2 neutral-100 */
+    --secondary-foreground: 0 0% 10%;
+    --muted: 150 21% 95%; /* #F1F4F2 */
+    --muted-foreground: 0 0% 48%; /* #7A7A7A ink-muted */
+    --accent: 143 62% 92%; /* #EAF9F0 green-100 */
+    --accent-foreground: 133 39% 30%;
+    --destructive: 0 84% 60%; /* #EF4444 */
     --destructive-foreground: 0 0% 100%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 168 76% 42%;
-    --chart-1: 168 76% 42%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
+    --border: 150 12% 94%; /* #EDF1EF hairline */
+    --input: 150 12% 94%;
+    --ring: 144 61% 50%; /* #31CC71 electric (focus) */
+    --chart-1: 133 39% 30%;
+    --chart-2: 144 61% 50%;
+    --chart-3: 150 100% 21%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
-    --radius: 0.625rem;
+    --radius: 0.875rem; /* 14px — button radius */
+
+    /* --- Yonima custom tokens (non-shadcn, hex) ----------------------- */
+    --green-forest: #2e6a3b;
+    --green-electric: #31cc71;
+    --green-deep: #006d36;
+    --green-50: #f2f8f4;
+    --green-100: #eaf9f0;
+    --green-200: #beebd1;
+    --bg-warm: #fcf9f8;
+    --neutral-100: #f1f4f2;
+    --neutral-200: #e4e9e6;
+    --neutral-300: #edf1ef;
+    --neutral-500: #a8adaa;
+    --ink: #1a1a1a;
+    --ink-muted: #7a7a7a;
+    --danger: #ef4444;
+    --warning: #ffa500;
+    --warning-bg: #fff6e5;
+    --warning-ink: #8a5a00;
+    --success: #10b981;
+
+    /* Radius scale */
+    --radius-sm: 8px;
+    --radius-md: 14px;
+    --radius-lg: 18px;
+    --radius-xl: 20px;
+    --radius-2xl: 26px;
+    --radius-pill: 99px;
+
+    /* Elevation (hairline-first) */
+    --shadow-card: 0 1px 2px rgba(26, 26, 26, 0.04);
+    --shadow-raised: 0 8px 24px rgba(26, 26, 26, 0.08);
+    --shadow-float: 0 20px 60px rgba(26, 26, 26, 0.1);
   }
 
+  /* Light-only system: the DS forbids dark canvases. Keep .dark = light. */
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 168 76% 50%;
+    --background: 210 40% 98%;
+    --foreground: 0 0% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 10%;
+    --primary: 133 39% 30%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 168 76% 50%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
+    --secondary: 150 21% 95%;
+    --secondary-foreground: 0 0% 10%;
+    --muted: 150 21% 95%;
+    --muted-foreground: 0 0% 48%;
+    --accent: 143 62% 92%;
+    --accent-foreground: 133 39% 30%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 150 12% 94%;
+    --input: 150 12% 94%;
+    --ring: 144 61% 50%;
   }
 }
 

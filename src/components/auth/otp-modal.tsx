@@ -12,6 +12,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
+import { OTP_LENGTH } from '@/lib/constants';
 import { sanitizeOTP, isValidOTP } from '@/lib/validators';
 import type { OTPChannel } from '@/types/auth';
 import { OTP_CHANNEL_MESSAGES } from '@/types/auth';
@@ -146,7 +147,7 @@ export function OtpModal({
               type="text"
               inputMode="numeric"
               pattern="[0-9]*"
-              maxLength={6}
+              maxLength={OTP_LENGTH}
               value={otpCode}
               onChange={(e) => handleOtpChange(e.target.value)}
               onKeyDown={handleKeyDown}
@@ -155,7 +156,7 @@ export function OtpModal({
                 'h-14 text-center text-3xl font-bold tracking-[0.5em] placeholder:tracking-[0.5em]',
                 error && 'border-destructive'
               )}
-              placeholder="------"
+              placeholder={'-'.repeat(OTP_LENGTH)}
               autoComplete="one-time-code"
             />
             {error && (

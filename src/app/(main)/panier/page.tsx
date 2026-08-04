@@ -11,9 +11,10 @@ import { useCartStore } from '@/stores/cart-store';
 import { useDeliveryAddressStore } from '@/stores/delivery-address-store';
 import { useAuth } from '@/hooks/use-auth';
 import { useAnalytics } from '@/hooks/use-analytics';
-import { formatPrice } from '@/lib/utils';
+import { formatPrice, vendorUrl } from '@/lib/utils';
 import { ROUTES } from '@/lib/constants';
 import { AddressPickerScreen } from '@/components/checkout/address-picker-screen';
+import { CartsList } from '@/components/cart/carts-list';
 
 export default function PanierPage() {
   const router = useRouter();
@@ -23,11 +24,23 @@ export default function PanierPage() {
     establishment,
     updateQuantity,
     removeItem,
-    clear,
+    clearVendor: clear,
     getSubtotal,
     getDeliveryFee,
     getTotal,
+    getCartCount,
+    setActiveVendor,
   } = useCartStore();
+
+  // Multi-cart routing: with ≥2 carts, land on the "Paniers" list unless the
+  // user drilled into a specific cart. 0/1 cart goes straight to the content.
+  // `mounted` avoids an SSR/CSR hydration mismatch: the persisted cart store is
+  // empty on the server, so we only branch on cart count after hydration.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const cartCount = getCartCount();
+  const [viewVendorId, setViewVendorId] = useState<string | null>(null);
+  const showList = mounted && cartCount >= 2 && viewVendorId === null;
 
   // Delivery address from shared store - subscribe to specific values for reactivity
   const {
@@ -63,25 +76,6 @@ export default function PanierPage() {
       );
     }
   }, []);
-
-  // Get the URL to add more items from the same establishment
-  const getEstablishmentUrl = () => {
-    if (!establishment) return '/';
-
-    const { type, slug, id } = establishment;
-    const identifier = slug || id;
-
-    switch (type) {
-      case 'restaurant':
-        return `/restaurants/${identifier}`;
-      case 'store':
-        return `/commerces/${identifier}`;
-      case 'grocery':
-        return '/epicerie';
-      default:
-        return '/';
-    }
-  };
 
   // Check if address is valid
   const hasValidAddress = hasAddress() && isZoneCovered;
@@ -131,6 +125,30 @@ export default function PanierPage() {
     router.push('/commandes/nouveau');
   };
 
+  // Before hydration the persisted cart is empty; render a neutral shell so the
+  // server and first client paint agree (no empty-cart flash, no mismatch).
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="sticky top-0 z-50 flex h-14 items-center border-b bg-white px-4">
+          <h1 className="font-semibold text-lg">Mon panier</h1>
+        </div>
+      </div>
+    );
+  }
+
+  // ≥2 carts and no cart drilled into → show the "Paniers" list.
+  if (showList) {
+    return (
+      <CartsList
+        onView={(vendorId) => {
+          setActiveVendor(vendorId);
+          setViewVendorId(vendorId);
+        }}
+      />
+    );
+  }
+
   if (items.length === 0) {
     return (
       <div className="min-h-screen bg-gray-50">
@@ -171,17 +189,32 @@ export default function PanierPage() {
       {/* Header */}
       <div className="sticky top-0 z-50 bg-background border-b">
         <div className="container flex items-center justify-between h-14">
-          <Button variant="ghost" size="icon" className="rounded-full" asChild>
-            <Link href="/">
+          {cartCount >= 2 ? (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-full"
+              onClick={() => setViewVendorId(null)}
+              aria-label="Retour aux paniers"
+            >
               <ChevronLeft className="h-5 w-5" />
-            </Link>
-          </Button>
+            </Button>
+          ) : (
+            <Button variant="ghost" size="icon" className="rounded-full" asChild>
+              <Link href="/">
+                <ChevronLeft className="h-5 w-5" />
+              </Link>
+            </Button>
+          )}
           <h1 className="font-semibold text-lg">Mon panier</h1>
           <Button
             variant="ghost"
             size="icon"
             className="rounded-full text-destructive hover:text-destructive"
-            onClick={() => clear()}
+            onClick={() => {
+              clear();
+              setViewVendorId(null);
+            }}
           >
             <Trash2 className="h-5 w-5" />
           </Button>
@@ -280,7 +313,7 @@ export default function PanierPage() {
           className="w-full h-12 border-dashed border-2"
           asChild
         >
-          <Link href={getEstablishmentUrl()}>
+          <Link href={vendorUrl(establishment)}>
             <PlusCircle className="h-5 w-5 mr-2" />
             Ajouter d&apos;autres articles
           </Link>

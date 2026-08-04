@@ -95,8 +95,11 @@ export default function NouvelleCommandePage() {
     getSubtotal,
     getDeliveryFee,
     getTotal,
-    clear,
+    clearVendor,
   } = useCartStore();
+  // After a successful order we only clear the vendor that was ordered, not
+  // every open cart (multi-restaurant model). Defaults to the active vendor.
+  const clear = clearVendor;
 
   // Get delivery address from shared store
   const deliveryAddressStore = useDeliveryAddressStore();

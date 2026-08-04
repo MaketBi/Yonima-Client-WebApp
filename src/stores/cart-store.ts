@@ -4,151 +4,265 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { CartItem, Vendor } from '@/types/models';
 
+/** One cart per restaurant. */
+export interface VendorCart {
+  vendor: Vendor | null;
+  items: CartItem[];
+  /** Timestamp of the last mutation — used to pick the active cart. */
+  updatedAt: number;
+}
+
 interface CartStore {
+  /** Multi-restaurant model: a separate cart per vendor, never cleared silently. */
+  carts: Record<string, VendorCart>;
+  /** The most recently modified cart (where new items land / what the cart page shows). */
+  activeVendorId: string | null;
+
+  // --- Materialized view of the ACTIVE cart (kept in sync on every mutation) ---
+  // Real state fields (not getters) so persist rehydration works reliably and
+  // existing product/cart/checkout components keep reading them unchanged.
   items: CartItem[];
   vendorId: string | null;
   establishment: Vendor | null;
 
-  // Actions
+  // --- Mutations ---
   addItem: (item: Omit<CartItem, 'quantity'> & { quantity?: number }, vendor?: Vendor) => void;
-  removeItem: (id: string) => void;
-  updateQuantity: (id: string, quantity: number) => void;
-  incrementQuantity: (id: string) => void;
-  decrementQuantity: (id: string) => void;
+  removeItem: (id: string, vendorId?: string) => void;
+  updateQuantity: (id: string, quantity: number, vendorId?: string) => void;
+  incrementQuantity: (id: string, vendorId?: string) => void;
+  decrementQuantity: (id: string, vendorId?: string) => void;
+  /** Clear a single vendor's cart (default: the active one). */
+  clearVendor: (vendorId?: string) => void;
+  /** Clear everything. */
   clear: () => void;
-  setEstablishment: (establishment: Vendor) => void;
-  canAddFromEstablishment: (vendorId: string) => boolean;
+  setActiveVendor: (vendorId: string) => void;
 
-  // Computed (using getters via selectors)
+  // --- Computed (multi-cart) ---
+  getCartCount: () => number;
+  getVendorIds: () => string[];
+  getVendorCart: (vendorId: string) => VendorCart | null;
+  getActiveCart: () => VendorCart | null;
+  getVendorSubtotal: (vendorId: string) => number;
+  getVendorItemCount: (vendorId: string) => number;
+
+  // --- Computed on the active cart (mono-vendor API) ---
   getTotalItems: () => number;
   getSubtotal: () => number;
   getDeliveryFee: () => number;
   getTotal: () => number;
+  canAddFromEstablishment: (vendorId: string) => boolean;
+}
+
+/** Resolve which vendor a given item id lives in (used when callers omit vendorId). */
+function findVendorOfItem(
+  carts: Record<string, VendorCart>,
+  id: string,
+  fallback: string | null
+): string | null {
+  if (fallback && carts[fallback]?.items.some((i) => i.id === id)) return fallback;
+  for (const [vid, cart] of Object.entries(carts)) {
+    if (cart.items.some((i) => i.id === id)) return vid;
+  }
+  return fallback;
+}
+
+/** After a change, pick the most recently updated non-empty cart as active. */
+function recomputeActive(carts: Record<string, VendorCart>): string | null {
+  let best: string | null = null;
+  let bestTs = -1;
+  for (const [vid, cart] of Object.entries(carts)) {
+    if (cart.items.length > 0 && cart.updatedAt > bestTs) {
+      best = vid;
+      bestTs = cart.updatedAt;
+    }
+  }
+  return best;
+}
+
+/**
+ * Build the full persisted+materialized slice from carts + a preferred active id.
+ * Keeps items/vendorId/establishment in lockstep with the active cart.
+ */
+function materialize(
+  carts: Record<string, VendorCart>,
+  preferredActive: string | null
+) {
+  const activeVendorId =
+    preferredActive && carts[preferredActive]?.items.length
+      ? preferredActive
+      : recomputeActive(carts);
+  const active = activeVendorId ? carts[activeVendorId] : null;
+  return {
+    carts,
+    activeVendorId,
+    items: active?.items ?? [],
+    vendorId: activeVendorId,
+    establishment: active?.vendor ?? null,
+  };
 }
 
 export const useCartStore = create<CartStore>()(
   persist(
     (set, get) => ({
+      carts: {},
+      activeVendorId: null,
       items: [],
       vendorId: null,
       establishment: null,
 
       addItem: (item, vendor) => {
-        const { items, vendorId } = get();
+        const { carts } = get();
+        const vid = item.vendor_id;
+        const existing = carts[vid];
+        const now = Date.now();
 
-        // Check if cart is from different vendor
-        if (vendorId && vendorId !== item.vendor_id) {
-          // Clear cart before adding from new vendor
-          set({ items: [], vendorId: null, establishment: null });
-        }
-
-        const existingIndex = items.findIndex(
-          (i) => i.id === item.id && i.type === item.type
-        );
-
-        if (existingIndex > -1) {
-          // Update quantity
-          const updatedItems = [...items];
-          updatedItems[existingIndex].quantity += item.quantity ?? 1;
-          set({ items: updatedItems });
+        let nextCart: VendorCart;
+        if (existing) {
+          const idx = existing.items.findIndex((i) => i.id === item.id && i.type === item.type);
+          const items =
+            idx > -1
+              ? existing.items.map((i, k) =>
+                  k === idx ? { ...i, quantity: i.quantity + (item.quantity ?? 1) } : i
+                )
+              : [...existing.items, { ...item, quantity: item.quantity ?? 1 }];
+          nextCart = { vendor: vendor ?? existing.vendor, items, updatedAt: now };
         } else {
-          // Add new item and set establishment if provided
-          set({
-            items: [...items, { ...item, quantity: item.quantity ?? 1 }],
-            vendorId: item.vendor_id,
-            ...(vendor && { establishment: vendor }),
-          });
+          nextCart = {
+            vendor: vendor ?? null,
+            items: [{ ...item, quantity: item.quantity ?? 1 }],
+            updatedAt: now,
+          };
         }
+        set(materialize({ ...carts, [vid]: nextCart }, vid));
       },
 
-      removeItem: (id) => {
-        const { items } = get();
-        const updatedItems = items.filter((i) => i.id !== id);
+      removeItem: (id, vendorId) => {
+        const { carts, activeVendorId } = get();
+        const vid = vendorId ?? findVendorOfItem(carts, id, activeVendorId);
+        if (!vid || !carts[vid]) return;
 
-        if (updatedItems.length === 0) {
-          set({ items: [], vendorId: null, establishment: null });
-        } else {
-          set({ items: updatedItems });
-        }
+        const items = carts[vid].items.filter((i) => i.id !== id);
+        const next = { ...carts };
+        if (items.length === 0) delete next[vid];
+        else next[vid] = { ...carts[vid], items, updatedAt: Date.now() };
+        set(materialize(next, activeVendorId));
       },
 
-      updateQuantity: (id, quantity) => {
+      updateQuantity: (id, quantity, vendorId) => {
         if (quantity <= 0) {
-          get().removeItem(id);
+          get().removeItem(id, vendorId);
           return;
         }
+        const { carts, activeVendorId } = get();
+        const vid = vendorId ?? findVendorOfItem(carts, id, activeVendorId);
+        if (!vid || !carts[vid]) return;
 
-        const { items } = get();
-        const updatedItems = items.map((item) =>
-          item.id === id ? { ...item, quantity } : item
-        );
-        set({ items: updatedItems });
+        const items = carts[vid].items.map((i) => (i.id === id ? { ...i, quantity } : i));
+        set(materialize({ ...carts, [vid]: { ...carts[vid], items, updatedAt: Date.now() } }, activeVendorId));
       },
 
-      incrementQuantity: (id) => {
-        const { items } = get();
-        const item = items.find((i) => i.id === id);
-        if (item) {
-          get().updateQuantity(id, item.quantity + 1);
-        }
+      incrementQuantity: (id, vendorId) => {
+        const { carts, activeVendorId } = get();
+        const vid = vendorId ?? findVendorOfItem(carts, id, activeVendorId);
+        const item = vid ? carts[vid]?.items.find((i) => i.id === id) : undefined;
+        if (item) get().updateQuantity(id, item.quantity + 1, vid ?? undefined);
       },
 
-      decrementQuantity: (id) => {
-        const { items } = get();
-        const item = items.find((i) => i.id === id);
-        if (item) {
-          get().updateQuantity(id, item.quantity - 1);
-        }
+      decrementQuantity: (id, vendorId) => {
+        const { carts, activeVendorId } = get();
+        const vid = vendorId ?? findVendorOfItem(carts, id, activeVendorId);
+        const item = vid ? carts[vid]?.items.find((i) => i.id === id) : undefined;
+        if (item) get().updateQuantity(id, item.quantity - 1, vid ?? undefined);
       },
 
-      clear: () => {
-        set({ items: [], vendorId: null, establishment: null });
+      clearVendor: (vendorId) => {
+        const { carts, activeVendorId } = get();
+        const vid = vendorId ?? activeVendorId;
+        if (!vid || !carts[vid]) return;
+        const next = { ...carts };
+        delete next[vid];
+        set(materialize(next, activeVendorId === vid ? null : activeVendorId));
       },
 
-      setEstablishment: (establishment) => {
-        set({ establishment, vendorId: establishment.id });
+      clear: () => set(materialize({}, null)),
+
+      setActiveVendor: (vendorId) => {
+        const { carts } = get();
+        if (carts[vendorId]) set(materialize(carts, vendorId));
       },
 
-      canAddFromEstablishment: (vendorId) => {
-        const { vendorId: currentVendorId, items } = get();
-        // Can add if cart is empty or same vendor
-        return items.length === 0 || currentVendorId === vendorId;
+      // --- Computed (multi-cart) ---
+      getCartCount: () => Object.keys(get().carts).length,
+      getVendorIds: () => Object.keys(get().carts),
+      getVendorCart: (vendorId) => get().carts[vendorId] ?? null,
+      getActiveCart: () => {
+        const { carts, activeVendorId } = get();
+        return activeVendorId ? carts[activeVendorId] ?? null : null;
       },
+      getVendorSubtotal: (vendorId) =>
+        (get().carts[vendorId]?.items ?? []).reduce((t, i) => t + i.price * i.quantity, 0),
+      getVendorItemCount: (vendorId) =>
+        (get().carts[vendorId]?.items ?? []).reduce((t, i) => t + i.quantity, 0),
 
-      getTotalItems: () => {
-        return get().items.reduce((total, item) => total + item.quantity, 0);
-      },
-
-      getSubtotal: () => {
-        return get().items.reduce(
-          (total, item) => total + item.price * item.quantity,
-          0
-        );
-      },
-
-      getDeliveryFee: () => {
-        const { establishment } = get();
-        return establishment?.delivery_fee ?? 1000;
-      },
-
-      getTotal: () => {
-        return get().getSubtotal() + get().getDeliveryFee();
-      },
+      // --- Computed on the active cart ---
+      getTotalItems: () => get().items.reduce((t, i) => t + i.quantity, 0),
+      getSubtotal: () => get().items.reduce((t, i) => t + i.price * i.quantity, 0),
+      getDeliveryFee: () => get().establishment?.delivery_fee ?? 1000,
+      getTotal: () => get().getSubtotal() + get().getDeliveryFee(),
+      canAddFromEstablishment: () => true,
     }),
     {
-      name: 'yonima-cart',
+      name: 'yonima-cart-v2',
+      version: 2,
+      // Only persist the source of truth; materialized fields are rebuilt on merge.
       partialize: (state) => ({
-        items: state.items,
-        vendorId: state.vendorId,
-        establishment: state.establishment,
+        carts: state.carts,
+        activeVendorId: state.activeVendorId,
       }),
+      // Rebuild items/vendorId/establishment from the persisted carts on rehydrate.
+      merge: (persisted, current) => {
+        const p = (persisted ?? {}) as Partial<CartStore>;
+        return { ...current, ...materialize(p.carts ?? {}, p.activeVendorId ?? null) };
+      },
+      // Migrate the old mono-vendor shape ({ items, vendorId, establishment }) → carts.
+      migrate: (persisted: unknown, version: number) => {
+        if (version < 2 && persisted && typeof persisted === 'object') {
+          const old = persisted as {
+            items?: CartItem[];
+            vendorId?: string | null;
+            establishment?: Vendor | null;
+          };
+          if (old.items?.length && old.vendorId) {
+            return {
+              carts: {
+                [old.vendorId]: {
+                  vendor: old.establishment ?? null,
+                  items: old.items,
+                  updatedAt: Date.now(),
+                },
+              },
+              activeVendorId: old.vendorId,
+            } as Partial<CartStore>;
+          }
+        }
+        return persisted as Partial<CartStore>;
+      },
     }
   )
 );
 
-// Selectors for computed values (to avoid re-renders)
-export const useCartItems = () => useCartStore((state) => state.items);
-export const useCartItemCount = () => useCartStore((state) => state.getTotalItems());
-export const useCartSubtotal = () => useCartStore((state) => state.getSubtotal());
-export const useCartTotal = () => useCartStore((state) => state.getTotal());
-export const useCartEstablishment = () => useCartStore((state) => state.establishment);
+// --- Selectors ---
+
+// Active-cart selectors
+export const useCartItems = () => useCartStore((s) => s.items);
+export const useCartSubtotal = () => useCartStore((s) => s.getSubtotal());
+export const useCartTotal = () => useCartStore((s) => s.getTotal());
+export const useCartEstablishment = () => useCartStore((s) => s.establishment);
+
+/** Header/nav badge = number of distinct carts (matches the mobile design's "2"). */
+export const useCartItemCount = () => useCartStore((s) => Object.keys(s.carts).length);
+
+// Multi-cart selectors
+export const useCartCount = () => useCartStore((s) => Object.keys(s.carts).length);
+export const useActiveVendorId = () => useCartStore((s) => s.activeVendorId);
+export const useActiveCart = () => useCartStore((s) => s.getActiveCart());

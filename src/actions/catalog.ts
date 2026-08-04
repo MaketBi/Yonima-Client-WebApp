@@ -1,7 +1,16 @@
 'use server';
 
 import { createServerClient } from '@/lib/supabase/server';
+import { CUISINE_EMOJI, cuisineEmoji } from '@/lib/constants';
 import type { Vendor, Product, Category, VendorCategory, Pack, VendorType } from '@/types/models';
+
+export interface Cuisine {
+  /** The raw tag label as stored on the vendor (e.g. "Fast Food"). */
+  label: string;
+  emoji: string;
+  /** How many restaurants carry this cuisine tag. */
+  count: number;
+}
 
 /**
  * Get vendors by type with optional filters
@@ -13,6 +22,8 @@ export async function getVendorsByType(
     offset?: number;
     featured?: boolean;
     search?: string;
+    /** Filter to vendors carrying this cuisine tag (matched against vendors.tags). */
+    cuisine?: string;
   }
 ): Promise<Vendor[]> {
   try {
@@ -27,6 +38,11 @@ export async function getVendorsByType(
 
     if (options?.featured) {
       query = query.eq('is_featured', true);
+    }
+
+    if (options?.cuisine) {
+      // vendors.tags is a text[]; `contains` matches rows whose array includes the tag.
+      query = query.contains('tags', [options.cuisine]);
     }
 
     if (options?.search) {
@@ -51,6 +67,51 @@ export async function getVendorsByType(
     return data as Vendor[];
   } catch (error) {
     console.error('Error fetching vendors:', error);
+    return [];
+  }
+}
+
+/**
+ * Derive the list of cuisines for the home grid from `vendors.tags`.
+ * There is no dedicated cuisine table — cuisines live as free tags on
+ * restaurant vendors. We only surface tags we have a curated emoji for (this
+ * filters out generic tags like "Populaire"/"Traditionnel"), ordered by how
+ * many restaurants carry them.
+ */
+export async function getCuisines(limit?: number): Promise<Cuisine[]> {
+  try {
+    const supabase = await createServerClient();
+    const { data, error } = await supabase
+      .from('vendors')
+      .select('tags')
+      .eq('type', 'restaurant')
+      .eq('is_active', true);
+
+    if (error) {
+      console.error('Error fetching cuisines:', error);
+      return [];
+    }
+
+    // Count occurrences of each known cuisine tag (case-insensitive), keeping
+    // the first-seen label casing for display.
+    const counts = new Map<string, { label: string; count: number }>();
+    for (const row of (data ?? []) as { tags: string[] | null }[]) {
+      for (const rawTag of row.tags ?? []) {
+        const key = rawTag.trim().toLowerCase();
+        if (!(key in CUISINE_EMOJI)) continue; // only curated cuisines
+        const existing = counts.get(key);
+        if (existing) existing.count += 1;
+        else counts.set(key, { label: rawTag.trim(), count: 1 });
+      }
+    }
+
+    const cuisines = Array.from(counts.values())
+      .map(({ label, count }) => ({ label, emoji: cuisineEmoji(label), count }))
+      .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
+
+    return limit ? cuisines.slice(0, limit) : cuisines;
+  } catch (error) {
+    console.error('Error fetching cuisines:', error);
     return [];
   }
 }

@@ -9,9 +9,30 @@ const config: Config = {
   ],
   theme: {
   	extend: {
+  		fontFamily: {
+  			sans: ['var(--font-sans)', 'Outfit', 'Arial', 'Helvetica', 'sans-serif'],
+  		},
   		colors: {
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
+  			/* Yonima signature palette (raw hex tokens) */
+  			'green-forest': 'var(--green-forest)',
+  			'green-electric': 'var(--green-electric)',
+  			'green-deep': 'var(--green-deep)',
+  			'green-50': 'var(--green-50)',
+  			'green-100': 'var(--green-100)',
+  			'green-200': 'var(--green-200)',
+  			'bg-warm': 'var(--bg-warm)',
+  			'neutral-100': 'var(--neutral-100)',
+  			'neutral-200': 'var(--neutral-200)',
+  			'neutral-300': 'var(--neutral-300)',
+  			'neutral-500': 'var(--neutral-500)',
+  			ink: 'var(--ink)',
+  			'ink-muted': 'var(--ink-muted)',
+  			warning: 'var(--warning)',
+  			'warning-bg': 'var(--warning-bg)',
+  			'warning-ink': 'var(--warning-ink)',
+  			success: 'var(--success)',
   			card: {
   				DEFAULT: 'hsl(var(--card))',
   				foreground: 'hsl(var(--card-foreground))'
@@ -52,9 +73,18 @@ const config: Config = {
   			}
   		},
   		borderRadius: {
-  			lg: 'var(--radius)',
-  			md: 'calc(var(--radius) - 2px)',
-  			sm: 'calc(var(--radius) - 4px)'
+  			/* Yonima radius scale: 8 / 14 / 18 / 20 / 26 / 99 */
+  			sm: 'var(--radius-sm)',
+  			md: 'var(--radius-md)',
+  			lg: 'var(--radius-lg)',
+  			xl: 'var(--radius-xl)',
+  			'2xl': 'var(--radius-2xl)',
+  			pill: 'var(--radius-pill)'
+  		},
+  		boxShadow: {
+  			card: 'var(--shadow-card)',
+  			raised: 'var(--shadow-raised)',
+  			float: 'var(--shadow-float)'
   		}
   	}
   },

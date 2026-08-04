@@ -1,9 +1,26 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { CURRENCY } from "./constants"
+import type { Vendor } from "@/types/models"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
+}
+
+/** Catalog URL for a vendor, by type (restaurant / commerce / épicerie). */
+export function vendorUrl(vendor: Pick<Vendor, 'type' | 'slug' | 'id'> | null): string {
+  if (!vendor) return '/';
+  const identifier = vendor.slug || vendor.id;
+  switch (vendor.type) {
+    case 'restaurant':
+      return `/restaurants/${identifier}`;
+    case 'store':
+      return `/commerces/${identifier}`;
+    case 'grocery':
+      return '/epicerie';
+    default:
+      return '/';
+  }
 }
 
 /**
