@@ -5,7 +5,7 @@ import { Star, Clock, MapPin, Bike } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { SafeImage } from '@/components/shared/safe-image';
-import { cn, formatPrice, isVendorOpen } from '@/lib/utils';
+import { cn, formatPrice } from '@/lib/utils';
 import type { Vendor } from '@/types/models';
 
 interface EstablishmentCardProps {
@@ -15,8 +15,6 @@ interface EstablishmentCardProps {
 }
 
 export function EstablishmentCard({ establishment, href, className }: EstablishmentCardProps) {
-  const isOpen = establishment.is_open && isVendorOpen(establishment.opening_hours);
-
   return (
     <Link href={href}>
       <Card className={cn('overflow-hidden hover:shadow-md transition-shadow', className)}>
@@ -31,15 +29,6 @@ export function EstablishmentCard({ establishment, href, className }: Establishm
             fallback={<span className="text-4xl">🏪</span>}
             fallbackClassName="absolute inset-0"
           />
-
-          {/* Closed overlay */}
-          {!isOpen && (
-            <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-              <Badge variant="destructive" className="text-sm">
-                Fermé
-              </Badge>
-            </div>
-          )}
 
           {/* Logo */}
           {establishment.logo_url && (
