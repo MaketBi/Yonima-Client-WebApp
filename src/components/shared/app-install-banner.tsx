@@ -50,10 +50,10 @@ export function AppInstallBanner() {
 
     if (platform === 'ios') {
       // TestFlight or App Store URL
-      return iosAppUrl || 'https://apps.apple.com/app/poulzz';
+      return iosAppUrl || 'https://apps.apple.com/fr/app/yonima-plus/id6756845915';
     }
     // Play Store URL
-    return androidAppUrl || 'https://play.google.com/store/apps/details?id=com.poulzz.app';
+    return androidAppUrl || 'https://play.google.com/store/apps/details?id=com.poulzz.yonima.client&pcampaignid=web_share';
   };
 
   const getStoreName = () => {
