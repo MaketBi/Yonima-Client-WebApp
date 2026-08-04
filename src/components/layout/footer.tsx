@@ -38,9 +38,9 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <a href={LEGAL_URLS.about} className="hover:text-primary transition-colors">
+                <Link href={ROUTES.apropos} className="hover:text-primary transition-colors">
                   À propos
-                </a>
+                </Link>
               </li>
               <li>
                 <a href={LEGAL_URLS.support} className="hover:text-primary transition-colors">

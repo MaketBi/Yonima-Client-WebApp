@@ -11,7 +11,7 @@
 
 ## Informations (site officiel poulzz.com)
 
-- [À propos](https://www.poulzz.com/about): mission et zone desservie.
+- [À propos](https://www.poulzz.store/apropos): mission et zone desservie de l'app de livraison.
 - [Aide & support](https://www.poulzz.com/support): délais, zones, paiement, frais, suivi de commande.
 - [Contact](https://www.poulzz.com/contact): nous joindre.
 - [Conditions d'utilisation](https://www.poulzz.com/terms/client)

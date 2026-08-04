@@ -174,6 +174,7 @@ export const ROUTES = {
   profil: '/profil',
   fidelite: '/fidelite',
   notifications: '/notifications',
+  apropos: '/apropos', // page locale à la webapp client (≠ poulzz.com/about, autre sujet)
 } as const;
 
 // Pages légales & informationnelles : elles vivent sur le site vitrine
@@ -184,7 +185,6 @@ export const LEGAL_URLS = {
   privacy: 'https://www.poulzz.com/privacy/client',
   mentionsLegales: 'https://www.poulzz.com/legal/mentions-legales',
   contact: 'https://www.poulzz.com/contact',
-  about: 'https://www.poulzz.com/about',
   support: 'https://www.poulzz.com/support',
   getApp: 'https://www.poulzz.com/get',
   home: 'https://www.poulzz.com/',
