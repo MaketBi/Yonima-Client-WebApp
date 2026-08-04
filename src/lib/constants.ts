@@ -3,6 +3,16 @@
 export const APP_NAME = 'Yonima';
 export const APP_DESCRIPTION = 'Livraison rapide à Dakar';
 
+// Liens de téléchargement des apps mobiles (source unique de vérité).
+// URLs publiques codées en dur pour ne pas dépendre des env vars Vercel ;
+// une env var, si définie, reste prioritaire.
+export const IOS_APP_URL =
+  process.env.NEXT_PUBLIC_IOS_APP_URL ||
+  'https://apps.apple.com/fr/app/yonima-plus/id6756845915';
+export const ANDROID_APP_URL =
+  process.env.NEXT_PUBLIC_ANDROID_APP_URL ||
+  'https://play.google.com/store/apps/details?id=com.poulzz.yonima.client&pcampaignid=web_share';
+
 // Currency
 export const CURRENCY = 'FCFA';
 export const CURRENCY_LOCALE = 'fr-SN';
