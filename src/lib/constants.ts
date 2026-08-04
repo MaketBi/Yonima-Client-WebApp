@@ -14,8 +14,8 @@ export const MIN_ORDER_AMOUNT = 2000; // FCFA
 // Pagination
 export const PAGE_SIZE = 20;
 
-// OTP
-export const OTP_LENGTH = 6;
+// OTP — 4-digit code (matches the iOS app; see spec §15)
+export const OTP_LENGTH = 4;
 export const OTP_EXPIRY_MINUTES = 10;
 export const OTP_MAX_ATTEMPTS = 5;
 
@@ -34,6 +34,44 @@ export const VENDOR_TYPES = {
   store: 'Commerce',
   legacy: 'Autre',
 } as const;
+
+/**
+ * Cuisine → emoji mapping for the home "Choisis ta cuisine" grid.
+ * Cuisines are stored as free tags on `vendors.tags`; this maps common labels
+ * to a glyph. Keys are matched case-insensitively; unknown tags fall back to 🍽️.
+ */
+export const CUISINE_EMOJI: Record<string, string> = {
+  'fast food': '🍟',
+  burger: '🍔',
+  poulet: '🍗',
+  pizza: '🍕',
+  senegalais: '🥘',
+  sénégalais: '🥘',
+  'petit dej': '🥐',
+  'petit déj': '🥐',
+  africain: '🍲',
+  desserts: '🍰',
+  dessert: '🍰',
+  tacos: '🌮',
+  vietnamien: '🍜',
+  indien: '🍛',
+  italien: '🍝',
+  grillades: '🍖',
+  dibi: '🍖',
+  poisson: '🐟',
+  boissons: '🥤',
+  sushi: '🍣',
+  libanais: '🥙',
+  crepes: '🥞',
+  crêpes: '🥞',
+  glaces: '🍦',
+  glace: '🍦',
+} as const;
+
+/** Emoji for a cuisine tag, case/space-insensitive, with a plate fallback. */
+export function cuisineEmoji(tag: string): string {
+  return CUISINE_EMOJI[tag.trim().toLowerCase()] ?? '🍽️';
+}
 
 // Order status labels (French)
 export const ORDER_STATUS_LABELS: Record<string, string> = {

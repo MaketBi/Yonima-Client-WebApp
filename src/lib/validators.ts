@@ -3,9 +3,11 @@
  * Validation et sanitization des entrées utilisateur
  */
 
+import { OTP_LENGTH } from './constants';
+
 export const ErrorMessages = {
   INVALID_PHONE: 'Format de numéro invalide',
-  INVALID_OTP: 'Le code doit contenir 6 chiffres',
+  INVALID_OTP: `Le code doit contenir ${OTP_LENGTH} chiffres`,
   INVALID_NAME: 'Le nom doit contenir entre 2 et 50 caractères',
 } as const;
 
@@ -33,18 +35,18 @@ export function isValidSenegalPhone(phone: string): boolean {
 }
 
 /**
- * Sanitize OTP code - keep only digits, max 6
+ * Sanitize OTP code - keep only digits, truncated to OTP_LENGTH
  */
 export function sanitizeOTP(code: string): string {
-  return code.replace(/\D/g, '').slice(0, 6);
+  return code.replace(/\D/g, '').slice(0, OTP_LENGTH);
 }
 
 /**
- * Validate OTP code format (6 digits)
+ * Validate OTP code format (OTP_LENGTH digits)
  */
 export function isValidOTP(code: string): boolean {
   const sanitized = sanitizeOTP(code);
-  return sanitized.length === 6;
+  return sanitized.length === OTP_LENGTH;
 }
 
 /**

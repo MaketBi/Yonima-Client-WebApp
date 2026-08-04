@@ -3,22 +3,18 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Grid3X3, ShoppingCart, User } from 'lucide-react';
+import { Home, ShoppingCart, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { useCartItemCount } from '@/stores/cart-store';
 import { ROUTES } from '@/lib/constants';
 
+// Mobile IA: 3 tabs, matching the iOS app (Accueil / Panier / Profil).
 const navItems = [
   {
     href: ROUTES.home,
     label: 'Accueil',
     icon: Home,
-  },
-  {
-    href: ROUTES.epicerie,
-    label: 'Catégories',
-    icon: Grid3X3,
   },
   {
     href: ROUTES.panier,
@@ -50,7 +46,7 @@ export function BottomNav() {
   }
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t md:hidden">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t md:hidden">
       <div className="flex items-center justify-around h-16">
         {navItems.map((item) => {
           const isActive = pathname === item.href ||
@@ -70,7 +66,7 @@ export function BottomNav() {
                 <Icon className="h-5 w-5" />
                 {mounted && item.showBadge && cartItemCount > 0 && (
                   <Badge
-                    className="absolute -top-2 -right-2 h-4 w-4 flex items-center justify-center p-0 text-[10px]"
+                    className="absolute -top-2 -right-2 h-4 min-w-4 px-1 flex items-center justify-center p-0 text-[10px] border-2 border-white bg-green-electric text-white"
                   >
                     {cartItemCount > 9 ? '9+' : cartItemCount}
                   </Badge>

@@ -15,6 +15,10 @@ const badgeVariants = cva(
         destructive:
           "border-transparent bg-destructive text-destructive-foreground shadow hover:bg-destructive/80",
         outline: "text-foreground",
+        // Yonima: soft green pill (SPONSORISÉ, PANIER ACTIF, PAYÉ)
+        soft: "border-transparent bg-green-100 text-green-deep",
+        // Yonima: warning pill (PRIX MIS À JOUR)
+        warning: "border-transparent bg-warning-bg text-warning-ink",
       },
     },
     defaultVariants: {

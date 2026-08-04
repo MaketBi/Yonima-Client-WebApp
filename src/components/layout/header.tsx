@@ -5,18 +5,19 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Menu, ShoppingCart, User, Bell, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import { Badge } from '@/components/ui/badge';
+import { Wordmark } from '@/components/yonima/wordmark';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/use-auth';
 import { useCartItemCount } from '@/stores/cart-store';
 import { useUnreadNotificationsCount } from '@/hooks/use-realtime';
 import { APP_NAME, ROUTES } from '@/lib/constants';
 
+// Commerces is intentionally omitted from navigation (deep-link routes still live).
 const navLinks = [
   { href: ROUTES.home, label: 'Accueil' },
   { href: ROUTES.restaurants, label: 'Restaurants' },
-  { href: ROUTES.commerces, label: 'Commerces' },
   { href: ROUTES.epicerie, label: 'Épicerie' },
 ];
 
@@ -36,8 +37,8 @@ export function Header() {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="flex items-center space-x-2">
-          <span className="text-xl font-bold text-primary">{APP_NAME}</span>
+        <Link href="/" className="flex items-center space-x-2" aria-label={APP_NAME}>
+          <Wordmark size={22} />
         </Link>
 
         {/* Desktop Navigation */}
@@ -68,9 +69,9 @@ export function Header() {
             </Link>
           </Button>
 
-          {/* Notifications */}
+          {/* Notifications — desktop only (mobile has it in the home hero) */}
           {mounted && isAuthenticated && (
-            <Button variant="ghost" size="icon" asChild className="relative">
+            <Button variant="ghost" size="icon" asChild className="relative hidden md:flex">
               <Link href={ROUTES.notifications}>
                 <Bell className="h-5 w-5" />
                 {unreadNotificationsCount > 0 && (
@@ -86,25 +87,26 @@ export function Header() {
             </Button>
           )}
 
-          {/* Cart */}
-          <Button variant="ghost" size="icon" asChild className="relative">
+          {/* Carts — desktop only (mobile has it in the bottom nav) */}
+          <Button variant="ghost" size="icon" asChild className="relative hidden md:flex">
             <Link href={ROUTES.panier}>
               <ShoppingCart className="h-5 w-5" />
               {mounted && cartItemCount > 0 && (
                 <Badge
-                  className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
+                  className="absolute -top-1 -right-1 h-5 min-w-5 px-1 flex items-center justify-center p-0 text-xs border-2 border-white bg-green-electric text-white"
                 >
                   {cartItemCount > 9 ? '9+' : cartItemCount}
                 </Badge>
               )}
-              <span className="sr-only">Panier</span>
+              <span className="sr-only">Paniers</span>
             </Link>
           </Button>
 
           {/* Profile / Login - Show based on auth state */}
           {mounted && (
             isAuthenticated ? (
-              <Link href={ROUTES.profil}>
+              // Desktop only (mobile has Profil in the bottom nav)
+              <Link href={ROUTES.profil} className="hidden md:block">
                 <Button variant="ghost" size="icon">
                   <User className="h-5 w-5" />
                   <span className="sr-only">Profil</span>
@@ -132,6 +134,10 @@ export function Header() {
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+                <SheetTitle className="sr-only">Menu</SheetTitle>
+                <SheetDescription className="sr-only">
+                  Navigation principale de {APP_NAME}
+                </SheetDescription>
                 <nav className="flex flex-col space-y-4 mt-8">
                   {navLinks.map((link) => (
                     <Link

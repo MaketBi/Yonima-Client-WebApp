@@ -34,3 +34,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Design reference dump (Claude Design export) — not part of the app
+/Refonte/
+/Refonte.zip
+/note.md
+/Affiche1080x540.png

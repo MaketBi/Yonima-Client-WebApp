@@ -15,7 +15,8 @@ export function SafeImage({
   fallback,
   fallbackClassName,
   className,
-  loading = 'lazy',
+  loading,
+  priority,
   ...props
 }: SafeImageProps) {
   const [hasError, setHasError] = useState(false);
@@ -33,12 +34,15 @@ export function SafeImage({
     );
   }
 
+  // next/image forbids `priority` together with `loading`. Only set the default
+  // lazy loading when the image is NOT prioritized.
   return (
     <Image
       src={src}
       alt={alt}
       className={className}
-      loading={loading}
+      priority={priority}
+      {...(priority ? {} : { loading: loading ?? 'lazy' })}
       onError={() => setHasError(true)}
       {...props}
     />
