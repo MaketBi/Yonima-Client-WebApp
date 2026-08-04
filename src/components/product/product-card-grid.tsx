@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { useRouter, usePathname } from 'next/navigation';
-import { Plus } from 'lucide-react';
+import { Plus, Minus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useCartStore } from '@/stores/cart-store';
@@ -20,7 +20,7 @@ interface ProductCardGridProps {
 export function ProductCardGrid({ product, vendorId, vendor, className }: ProductCardGridProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const { items } = useCartStore();
+  const { items, updateQuantity, removeItem } = useCartStore();
   const { addToCart } = useCart();
 
   const cartItem = items.find((item) => item.id === product.id && item.type === 'product');
@@ -42,6 +42,24 @@ export function ProductCardGrid({ product, vendorId, vendor, className }: Produc
       },
       vendor
     );
+  };
+
+  const handleIncrement = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (cartItem) {
+      updateQuantity(product.id, quantity + 1);
+    }
+  };
+
+  const handleDecrement = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (quantity > 1) {
+      updateQuantity(product.id, quantity - 1);
+    } else {
+      removeItem(product.id);
+    }
   };
 
   const isAvailable = product.is_available && product.is_active;
@@ -80,22 +98,41 @@ export function ProductCardGrid({ product, vendorId, vendor, className }: Produc
           </div>
         )}
 
-        {/* Add Button */}
+        {/* Add / stepper */}
         {isAvailable && (
-          <Button
-            size="icon"
-            className={cn(
-              'absolute bottom-1.5 right-1.5 h-8 w-8 rounded-full shadow-lg',
-              quantity > 0 ? 'bg-primary' : 'bg-white text-primary hover:bg-white/90'
-            )}
-            onClick={handleAddToCart}
-          >
+          <div className="absolute bottom-1.5 right-1.5">
             {quantity > 0 ? (
-              <span className="text-xs font-bold">{quantity}</span>
+              <div className="flex items-center gap-0.5 bg-white rounded-full shadow-lg">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7 rounded-full hover:bg-muted"
+                  onClick={handleDecrement}
+                  aria-label="Retirer un"
+                >
+                  <Minus className="h-3.5 w-3.5" />
+                </Button>
+                <span className="text-xs font-bold w-4 text-center">{quantity}</span>
+                <Button
+                  size="icon"
+                  className="h-7 w-7 rounded-full bg-primary text-white hover:bg-primary/90"
+                  onClick={handleIncrement}
+                  aria-label="Ajouter un"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                </Button>
+              </div>
             ) : (
-              <Plus className="h-4 w-4" />
+              <Button
+                size="icon"
+                className="h-8 w-8 rounded-full bg-white text-primary hover:bg-white/90 shadow-lg"
+                onClick={handleAddToCart}
+                aria-label={`Ajouter ${product.name}`}
+              >
+                <Plus className="h-4 w-4" />
+              </Button>
             )}
-          </Button>
+          </div>
         )}
 
         {/* Unavailable overlay */}

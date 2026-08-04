@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Clock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { SafeImage } from "@/components/shared/safe-image";
-import { cn, formatPrice, isVendorOpen } from "@/lib/utils";
+import { cn, formatPrice } from "@/lib/utils";
 import type { Vendor } from "@/types/models";
 
 interface RestaurantCardProps {
@@ -27,7 +27,6 @@ export function RestaurantCard({
   priority = false,
   className,
 }: RestaurantCardProps) {
-  const isOpen = vendor.is_open && isVendorOpen(vendor.opening_hours);
   const cuisine = vendor.tags?.slice(0, 2).join(" · ");
   const free = vendor.delivery_fee <= 0;
 
@@ -44,7 +43,7 @@ export function RestaurantCard({
           src={vendor.cover_image_url || ""}
           alt={vendor.name}
           fill
-          className={cn("object-cover", !isOpen && "opacity-60")}
+          className="object-cover"
           sizes="(max-width: 768px) 100vw, 400px"
           priority={priority}
           fallback={<span className="text-4xl">🍽️</span>}
@@ -57,11 +56,6 @@ export function RestaurantCard({
           >
             SPONSORISÉ
           </Badge>
-        )}
-        {!isOpen && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <Badge variant="destructive">Fermé</Badge>
-          </div>
         )}
       </div>
 
