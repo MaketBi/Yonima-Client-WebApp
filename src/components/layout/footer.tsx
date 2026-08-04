@@ -37,6 +37,16 @@ export function Footer() {
                   Épicerie
                 </Link>
               </li>
+              <li>
+                <Link href={ROUTES.apropos} className="hover:text-primary transition-colors">
+                  À propos
+                </Link>
+              </li>
+              <li>
+                <Link href={ROUTES.aide} className="hover:text-primary transition-colors">
+                  Aide &amp; FAQ
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -67,17 +77,17 @@ export function Footer() {
             <h3 className="font-semibold mb-3">Légal</h3>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
-                <Link href="/conditions" className="hover:text-primary transition-colors">
+                <Link href={ROUTES.conditions} className="hover:text-primary transition-colors">
                   Conditions d&apos;utilisation
                 </Link>
               </li>
               <li>
-                <Link href="/confidentialite" className="hover:text-primary transition-colors">
+                <Link href={ROUTES.confidentialite} className="hover:text-primary transition-colors">
                   Politique de confidentialité
                 </Link>
               </li>
               <li>
-                <Link href="/contact" className="hover:text-primary transition-colors">
+                <Link href={ROUTES.contact} className="hover:text-primary transition-colors">
                   Contact
                 </Link>
               </li>

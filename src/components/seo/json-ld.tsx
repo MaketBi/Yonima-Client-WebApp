@@ -1,4 +1,4 @@
-import { APP_NAME } from "@/lib/constants";
+import { APP_NAME, COMPANY } from "@/lib/constants";
 import type { Vendor, Product } from "@/types/models";
 
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || "https://www.poulzz.store";
@@ -25,10 +25,21 @@ export function OrganizationJsonLd() {
     url: BASE_URL,
     logo: `${BASE_URL}/icons/icon-512x512.png`,
     description: "Livraison rapide à Dakar - Restaurants, commerces et épicerie",
+    email: COMPANY.email,
+    telephone: COMPANY.phone,
     address: {
       "@type": "PostalAddress",
+      streetAddress: COMPANY.address,
       addressLocality: "Dakar",
       addressCountry: "SN",
+    },
+    contactPoint: {
+      "@type": "ContactPoint",
+      contactType: "customer support",
+      email: COMPANY.email,
+      telephone: COMPANY.phone,
+      areaServed: "SN",
+      availableLanguage: ["fr"],
     },
     areaServed: {
       "@type": "City",

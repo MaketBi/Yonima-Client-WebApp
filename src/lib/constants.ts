@@ -11,6 +11,27 @@ export const IOS_APP_URL =
 export const ANDROID_APP_URL =
   'https://play.google.com/store/apps/details?id=com.poulzz.yonima.client&pcampaignid=web_share';
 
+// Coordonnées & informations légales de l'entreprise (source unique de vérité).
+// Utilisé par les pages Contact / Conditions / Confidentialité / À propos et le footer.
+// Note : l'email de contact est sur le domaine poulzz.com (≠ domaine du site poulzz.store).
+export const COMPANY = {
+  legalName: 'POULZZ - SUARL',
+  legalForm: 'Société Unipersonnelle à Responsabilité Limitée (SUARL)',
+  capital: '100 000 F CFA',
+  email: 'contact@poulzz.com',
+  phone: '+221 76 295 70 97',
+  whatsapp: '+221 76 295 70 97',
+  address: 'Bene Baraque, Ainoumady 2, Dakar 11000, Sénégal',
+  city: 'Dakar',
+  country: 'Sénégal',
+  publisher: 'Mamadou Diop', // gérant + directeur de la publication
+  host: 'Vercel Inc., 340 S Lemon Ave #4133, Walnut, CA 91789, USA',
+  ninea: '012814647',
+  rccm: 'SN DKR 2026 B 5030',
+  // Données personnelles : pas de DPO formel. Contact données ci-dessous ; autorité : CDP Sénégal.
+  dataProtectionAuthority: 'Commission de protection des données personnelles (CDP) du Sénégal',
+} as const;
+
 // Currency
 export const CURRENCY = 'FCFA';
 export const CURRENCY_LOCALE = 'fr-SN';
@@ -153,6 +174,11 @@ export const ROUTES = {
   profil: '/profil',
   fidelite: '/fidelite',
   notifications: '/notifications',
+  apropos: '/apropos',
+  contact: '/contact',
+  conditions: '/conditions',
+  confidentialite: '/confidentialite',
+  aide: '/aide',
 } as const;
 
 // API endpoints (Edge Functions)
