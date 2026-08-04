@@ -9,13 +9,14 @@
 - [Commerces](https://www.poulzz.store/commerces): boutiques et services de proximité.
 - [Épicerie](https://www.poulzz.store/epicerie): courses essentielles livrées en quelques minutes.
 
-## Informations
+## Informations (site officiel poulzz.com)
 
-- [À propos](https://www.poulzz.store/apropos): mission et zone desservie.
-- [Aide & FAQ](https://www.poulzz.store/aide): délais, zones, paiement, frais, suivi de commande.
-- [Contact](https://www.poulzz.store/contact): nous joindre.
-- [Conditions d'utilisation](https://www.poulzz.store/conditions)
-- [Politique de confidentialité](https://www.poulzz.store/confidentialite)
+- [À propos](https://www.poulzz.com/about): mission et zone desservie.
+- [Aide & support](https://www.poulzz.com/support): délais, zones, paiement, frais, suivi de commande.
+- [Contact](https://www.poulzz.com/contact): nous joindre.
+- [Conditions d'utilisation](https://www.poulzz.com/terms/client)
+- [Politique de confidentialité](https://www.poulzz.com/privacy/client)
+- [Mentions légales](https://www.poulzz.com/legal/mentions-legales)
 
 ## Applications mobiles
 

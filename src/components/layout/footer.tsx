@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { APP_NAME, ROUTES, IOS_APP_URL, ANDROID_APP_URL } from '@/lib/constants';
+import { APP_NAME, ROUTES, LEGAL_URLS, IOS_APP_URL, ANDROID_APP_URL } from '@/lib/constants';
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
@@ -38,14 +38,14 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href={ROUTES.apropos} className="hover:text-primary transition-colors">
+                <a href={LEGAL_URLS.about} className="hover:text-primary transition-colors">
                   À propos
-                </Link>
+                </a>
               </li>
               <li>
-                <Link href={ROUTES.aide} className="hover:text-primary transition-colors">
-                  Aide &amp; FAQ
-                </Link>
+                <a href={LEGAL_URLS.support} className="hover:text-primary transition-colors">
+                  Aide &amp; support
+                </a>
               </li>
             </ul>
           </div>
@@ -77,19 +77,24 @@ export function Footer() {
             <h3 className="font-semibold mb-3">Légal</h3>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
-                <Link href={ROUTES.conditions} className="hover:text-primary transition-colors">
+                <a href={LEGAL_URLS.terms} className="hover:text-primary transition-colors">
                   Conditions d&apos;utilisation
-                </Link>
+                </a>
               </li>
               <li>
-                <Link href={ROUTES.confidentialite} className="hover:text-primary transition-colors">
+                <a href={LEGAL_URLS.privacy} className="hover:text-primary transition-colors">
                   Politique de confidentialité
-                </Link>
+                </a>
               </li>
               <li>
-                <Link href={ROUTES.contact} className="hover:text-primary transition-colors">
+                <a href={LEGAL_URLS.mentionsLegales} className="hover:text-primary transition-colors">
+                  Mentions légales
+                </a>
+              </li>
+              <li>
+                <a href={LEGAL_URLS.contact} className="hover:text-primary transition-colors">
                   Contact
-                </Link>
+                </a>
               </li>
             </ul>
           </div>

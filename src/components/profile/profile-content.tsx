@@ -33,7 +33,7 @@ import {
 import { signOut } from '@/actions/auth';
 import { useUserStore } from '@/stores/user-store';
 import { getInitials, formatPhone } from '@/lib/utils';
-import { ROUTES } from '@/lib/constants';
+import { ROUTES, LEGAL_URLS } from '@/lib/constants';
 import type { User as UserType } from '@/types/models';
 
 interface ProfileContentProps {
@@ -73,14 +73,15 @@ const menuItems = [
   },
 ];
 
+// Pages hébergées sur le site vitrine www.poulzz.com → liens externes.
 const supportItems = [
   {
-    href: '/aide',
+    href: LEGAL_URLS.support,
     icon: HelpCircle,
     label: 'Aide & Support',
   },
   {
-    href: '/conditions',
+    href: LEGAL_URLS.terms,
     icon: FileText,
     label: "Conditions d'utilisation",
   },
@@ -180,14 +181,14 @@ export function ProfileContent({ user }: ProfileContentProps) {
             const Icon = item.icon;
             return (
               <div key={item.href}>
-                <Link
+                <a
                   href={item.href}
                   className="flex items-center gap-4 p-4 hover:bg-muted transition-colors"
                 >
                   <Icon className="h-5 w-5 text-muted-foreground" />
                   <span className="flex-1">{item.label}</span>
                   <ChevronRight className="h-5 w-5 text-muted-foreground" />
-                </Link>
+                </a>
                 {index < supportItems.length - 1 && <Separator />}
               </div>
             );

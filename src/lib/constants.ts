@@ -174,11 +174,20 @@ export const ROUTES = {
   profil: '/profil',
   fidelite: '/fidelite',
   notifications: '/notifications',
-  apropos: '/apropos',
-  contact: '/contact',
-  conditions: '/conditions',
-  confidentialite: '/confidentialite',
-  aide: '/aide',
+} as const;
+
+// Pages légales & informationnelles : elles vivent sur le site vitrine
+// www.poulzz.com (app CLIENT → variantes /terms/client, /privacy/client).
+// La webapp (poulzz.store) pointe vers ces URLs externes, on ne duplique pas.
+export const LEGAL_URLS = {
+  terms: 'https://www.poulzz.com/terms/client',
+  privacy: 'https://www.poulzz.com/privacy/client',
+  mentionsLegales: 'https://www.poulzz.com/legal/mentions-legales',
+  contact: 'https://www.poulzz.com/contact',
+  about: 'https://www.poulzz.com/about',
+  support: 'https://www.poulzz.com/support',
+  getApp: 'https://www.poulzz.com/get',
+  home: 'https://www.poulzz.com/',
 } as const;
 
 // API endpoints (Edge Functions)
