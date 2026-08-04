@@ -63,7 +63,7 @@ export function AppInstallBanner() {
         <div className="flex items-center gap-3">
           <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-primary/10">
             <Image
-              src="/icon-192.png"
+              src="/icons/icon-192x192.png"
               alt={APP_NAME}
               fill
               className="object-cover"
