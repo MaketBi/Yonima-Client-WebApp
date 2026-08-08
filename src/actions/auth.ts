@@ -3,6 +3,7 @@
 import { createServerClient } from '@/lib/supabase/server';
 import { cookies } from 'next/headers';
 import type {
+  AppType,
   OtpRequestResponse,
   OtpVerifyResponse,
   AuthErrorType,
@@ -113,11 +114,13 @@ function parseVerifyError(
  * @param phone Phone number with country code (e.g., +221771234567)
  * @param action 'login' or 'register'
  * @param fullName Full name (required for register)
+ * @param appType 'client' (défaut) ou 'vendor' pour l'Espace Vendeur
  */
 export async function requestOtp(
   phone: string,
   action: 'login' | 'register',
-  fullName?: string
+  fullName?: string,
+  appType: AppType = 'client'
 ): Promise<{
   success: boolean;
   channel?: 'whatsapp' | 'sms';
@@ -131,7 +134,7 @@ export async function requestOtp(
     // Request body for Edge Function
     const requestBody: Record<string, string> = {
       phone: normalizedPhone,
-      app_type: 'client', // IMPORTANT: Always "client" for client app
+      app_type: appType,
       action,
     };
 
@@ -180,12 +183,21 @@ export async function requestOtp(
 
 /**
  * Verify OTP code - Correspondance avec Android verifyOtp()
+ *
+ * ⚠️ `appType` n'est pas cosmétique : `simple-verify` promeut automatiquement
+ * l'utilisateur en `vendor_admin` si un `vendors` porte le même téléphone avec
+ * `owner_id IS NULL` (~385 boutiques prospectées en prod). Envoyer `'client'`
+ * désactive cette promotion — un client ne doit jamais devenir vendeur à son insu.
+ * Le back-office `/vendeur` envoie `'vendor'` pour la conserver.
+ *
  * @param phone Phone number with country code
- * @param code 6-digit OTP code
+ * @param code 4-digit OTP code
+ * @param appType 'client' (défaut) ou 'vendor'
  */
 export async function verifyOtp(
   phone: string,
-  code: string
+  code: string,
+  appType: AppType = 'client'
 ): Promise<{
   success: boolean;
   userId?: string;
@@ -211,6 +223,7 @@ export async function verifyOtp(
         body: JSON.stringify({
           phone: normalizedPhone,
           code,
+          app_type: appType,
         }),
       }
     );

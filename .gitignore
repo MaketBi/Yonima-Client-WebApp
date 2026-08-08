@@ -40,3 +40,6 @@ next-env.d.ts
 /Refonte.zip
 /note.md
 /Affiche1080x540.png
+
+# Réglages locaux Claude Code (propres à la machine)
+/.claude/

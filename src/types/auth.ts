@@ -3,6 +3,14 @@
 // OTP Channel (WhatsApp ou SMS)
 export type OTPChannel = 'whatsapp' | 'sms';
 
+/**
+ * Type d'app envoyé aux Edge Functions `simple-otp` / `simple-verify`.
+ * `simple-otp` n'accepte que 'client' | 'driver' | 'vendor'.
+ * Voir le commentaire de `verifyOtp` : ce champ conditionne l'auto-promotion
+ * en `vendor_admin` côté backend.
+ */
+export type AppType = 'client' | 'vendor';
+
 export const OTP_CHANNEL_MESSAGES: Record<OTPChannel, string> = {
   whatsapp: 'Un code a été envoyé sur votre WhatsApp',
   sms: 'Un code a été envoyé par SMS',
