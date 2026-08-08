@@ -90,6 +90,13 @@ export interface Vendor {
   opening_hours: OpeningHours | null;
   relevance_score: number | null;
 
+  // Champs pilotés par le back-office vendeur.
+  // `delivery_mode` : 'internal_only' (livreurs du vendeur) | 'pool_only' (pool Yonima).
+  // Peut être null sur d'anciennes lignes — traiter null comme 'internal_only'.
+  delivery_mode: 'internal_only' | 'pool_only' | null;
+  /** Temps de préparation en minutes (0–240). Remplace `estimated_time`, legacy. */
+  prep_time_minutes: number | null;
+
   created_at: string;
   updated_at: string;
 }

@@ -18,6 +18,9 @@ export default function robots(): MetadataRoute.Robots {
           "/login",
           "/register",
           "/offline",
+          // Back-office vendeur : jamais indexé (les pages portent aussi noindex).
+          "/vendeur",
+          "/vendeur/*",
         ],
       },
     ],

@@ -37,22 +37,37 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Protected routes
+  const { pathname } = request.nextUrl;
+
+  // Espace vendeur : sa propre page de connexion, distincte du parcours client.
+  // Le contrôle du rôle se fait dans le layout /vendeur (le middleware n'a pas
+  // accès au profil sans requête supplémentaire).
+  const isVendorRoute = pathname.startsWith('/vendeur');
+  const isVendorLogin = pathname === '/vendeur/connexion';
+
+  if (isVendorRoute && !isVendorLogin && !user) {
+    const url = request.nextUrl.clone();
+    url.pathname = '/vendeur/connexion';
+    url.searchParams.set('redirect', pathname);
+    return NextResponse.redirect(url);
+  }
+
+  // Protected routes (parcours client)
   const protectedRoutes = ['/commandes', '/profil', '/fidelite', '/notifications'];
   const isProtectedRoute = protectedRoutes.some((route) =>
-    request.nextUrl.pathname.startsWith(route)
+    pathname.startsWith(route)
   );
 
   if (isProtectedRoute && !user) {
     // Redirect to login with return URL
     const url = request.nextUrl.clone();
     url.pathname = '/login';
-    url.searchParams.set('redirect', request.nextUrl.pathname);
+    url.searchParams.set('redirect', pathname);
     return NextResponse.redirect(url);
   }
 
   // If user is logged in and tries to access login/register, redirect to home
-  if (user && (request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/register')) {
+  if (user && (pathname === '/login' || pathname === '/register')) {
     const url = request.nextUrl.clone();
     url.pathname = '/';
     return NextResponse.redirect(url);
