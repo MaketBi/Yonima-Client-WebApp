@@ -1,10 +1,13 @@
 import { Suspense } from 'react';
 import { Metadata } from 'next';
+import Link from 'next/link';
+import { Store } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { AuthForm } from '@/components/auth/auth-form';
 import { getCountries } from '@/actions/auth';
 import { Skeleton } from '@/components/ui/skeleton';
 import { APP_NAME } from '@/lib/constants';
+import { VENDOR_ROUTES } from '@/lib/vendor/constants';
 
 export const metadata: Metadata = {
   title: 'Connexion',
@@ -45,18 +48,32 @@ function LoginFormSkeleton() {
 
 export default async function LoginPage({ searchParams }: LoginPageProps) {
   return (
-    <Card>
-      <CardHeader className="text-center">
-        <CardTitle className="text-2xl">Connexion</CardTitle>
-        <CardDescription>
-          Entrez votre numéro de téléphone pour vous connecter
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Suspense fallback={<LoginFormSkeleton />}>
-          <LoginForm searchParams={searchParams} />
-        </Suspense>
-      </CardContent>
-    </Card>
+    <div className="space-y-4">
+      <Card>
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl">Connexion</CardTitle>
+          <CardDescription>
+            Entrez votre numéro de téléphone pour vous connecter
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Suspense fallback={<LoginFormSkeleton />}>
+            <LoginForm searchParams={searchParams} />
+          </Suspense>
+        </CardContent>
+      </Card>
+
+      {/* Les commerçants ont leur propre parcours (OTP `app_type: vendor`). */}
+      <p className="text-center text-sm text-muted-foreground">
+        Vous êtes commerçant ?{' '}
+        <Link
+          href={VENDOR_ROUTES.connexion}
+          className="inline-flex items-center gap-1 font-medium text-primary hover:underline"
+        >
+          <Store className="h-3.5 w-3.5" aria-hidden="true" />
+          Espace Vendeur
+        </Link>
+      </p>
+    </div>
   );
 }

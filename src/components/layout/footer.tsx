@@ -1,5 +1,7 @@
 import Link from 'next/link';
+import { Store } from 'lucide-react';
 import { APP_NAME, ROUTES, LEGAL_URLS, IOS_APP_URL, ANDROID_APP_URL } from '@/lib/constants';
+import { VENDOR_ROUTES } from '@/lib/vendor/constants';
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
@@ -67,6 +69,17 @@ export function Footer() {
               <li>
                 <Link href={ROUTES.profil} className="hover:text-primary transition-colors">
                   Mon profil
+                </Link>
+              </li>
+              <li className="pt-1">
+                {/* Point d'entrée vendeur : accessible même déconnecté, contrairement
+                    au bouton du header qui dépend d'une session. */}
+                <Link
+                  href={VENDOR_ROUTES.connexion}
+                  className="inline-flex items-center gap-1.5 font-medium text-primary transition-colors hover:text-green-deep"
+                >
+                  <Store className="h-3.5 w-3.5" aria-hidden="true" />
+                  Espace Vendeur
                 </Link>
               </li>
             </ul>

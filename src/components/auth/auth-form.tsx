@@ -23,6 +23,7 @@ import { canAttempt, recordAttempt, resetAttempts, getWaitTimeSeconds } from '@/
 import { sanitizeName, isValidName } from '@/lib/validators';
 import type { CountryData, OTPChannel } from '@/types/auth';
 import { APP_NAME } from '@/lib/constants';
+import { VENDOR_ROUTES } from '@/lib/vendor/constants';
 
 interface AuthFormProps {
   mode: 'login' | 'register';
@@ -120,7 +121,7 @@ export function AuthForm({
             setError(result.error || 'Une erreur est survenue');
         }
       }
-    } catch (err) {
+    } catch {
       setError('Erreur réseau. Vérifiez votre connexion.');
     } finally {
       setIsLoading(false);
@@ -154,9 +155,27 @@ export function AuthForm({
           refresh_token: result.refreshToken || '',
         });
 
+        // Un vendeur atterrit directement sur son back-office. Le header et le
+        // menu du compte gardent un lien vers la boutique s'il veut y revenir.
+        let destination = '/';
+        if (result.userId) {
+          const { data: profile } = await supabase
+            .from('users')
+            .select('role, vendor_id')
+            .eq('id', result.userId)
+            .maybeSingle();
+
+          if (
+            profile?.vendor_id &&
+            (profile.role === 'vendor_admin' || profile.role === 'vendor_assistant')
+          ) {
+            destination = VENDOR_ROUTES.commandes;
+          }
+        }
+
         // Close modal and redirect
         setShowOtpModal(false);
-        router.push('/');
+        router.push(destination);
         router.refresh();
       } else {
         setOtpError(result.error || 'Code incorrect');

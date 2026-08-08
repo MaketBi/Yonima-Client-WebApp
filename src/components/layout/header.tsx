@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu, ShoppingCart, User, Bell, Search } from 'lucide-react';
+import { Menu, ShoppingCart, User, Bell, Search, Store } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import { Badge } from '@/components/ui/badge';
@@ -13,6 +13,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { useCartItemCount } from '@/stores/cart-store';
 import { useUnreadNotificationsCount } from '@/hooks/use-realtime';
 import { APP_NAME, ROUTES } from '@/lib/constants';
+import { VENDOR_ROUTES } from '@/lib/vendor/constants';
 
 // Commerces is intentionally omitted from navigation (deep-link routes still live).
 const navLinks = [
@@ -32,6 +33,12 @@ export function Header() {
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Accès au back-office : réservé aux comptes vendeur rattachés à une boutique.
+  const isVendor =
+    !!user &&
+    (user.role === 'vendor_admin' || user.role === 'vendor_assistant') &&
+    !!user.vendor_id;
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -61,6 +68,16 @@ export function Header() {
 
         {/* Actions */}
         <div className="flex items-center space-x-2">
+          {/* Espace Vendeur — accès au back-office depuis la boutique */}
+          {mounted && isVendor && (
+            <Button asChild size="sm" className="hidden md:inline-flex">
+              <Link href={VENDOR_ROUTES.commandes}>
+                <Store className="mr-2 h-4 w-4" />
+                Espace Vendeur
+              </Link>
+            </Button>
+          )}
+
           {/* Search */}
           <Button variant="ghost" size="icon" asChild className="hidden sm:flex">
             <Link href="/search">
@@ -154,6 +171,15 @@ export function Header() {
                     </Link>
                   ))}
                   <hr className="my-4" />
+                  {isVendor && (
+                    <Link
+                      href={VENDOR_ROUTES.commandes}
+                      className="flex items-center gap-2 rounded-xl bg-primary px-4 py-3 text-lg font-semibold text-primary-foreground"
+                    >
+                      <Store className="h-5 w-5" />
+                      Espace Vendeur
+                    </Link>
+                  )}
                   {isAuthenticated ? (
                     <>
                       <Link
