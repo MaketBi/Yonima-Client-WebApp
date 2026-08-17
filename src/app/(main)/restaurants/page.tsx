@@ -1,9 +1,12 @@
 import { Metadata } from 'next';
 import { Suspense } from 'react';
+import Link from 'next/link';
 import { getVendorsByType } from '@/actions/catalog';
 import { EstablishmentList } from '@/components/establishment/establishment-list';
 import { BreadcrumbJsonLd } from '@/components/seo';
 import { Skeleton } from '@/components/ui/skeleton';
+import { CUISINES_CONTENT } from '@/lib/cuisines-content';
+import { cuisineEmoji } from '@/lib/constants';
 
 export const metadata: Metadata = {
   title: 'Restaurants à Dakar - Livraison rapide',
@@ -64,6 +67,24 @@ export default function RestaurantsPage() {
           Découvrez les meilleurs restaurants de Dakar
         </p>
       </div>
+
+      {/* Maillage vers les pages cuisine : sans ces liens en dur, elles ne
+          seraient atteignables que par le sitemap. */}
+      <nav aria-label="Cuisines" className="mb-6">
+        <ul className="flex flex-wrap gap-2">
+          {CUISINES_CONTENT.map((cuisine) => (
+            <li key={cuisine.slug}>
+              <Link
+                href={`/restaurants/cuisine/${cuisine.slug}`}
+                className="inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm hover:bg-muted transition-colors"
+              >
+                <span aria-hidden="true">{cuisineEmoji(cuisine.tag)}</span>
+                {cuisine.label}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </nav>
 
       <Suspense fallback={<RestaurantsSkeleton />}>
         <RestaurantsContent />

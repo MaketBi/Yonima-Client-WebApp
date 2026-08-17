@@ -1,6 +1,7 @@
 import { MetadataRoute } from "next";
 import { createServerClient } from "@/lib/supabase/server";
 import { getGroceryCategories } from "@/actions/catalog";
+import { CUISINES_CONTENT } from "@/lib/cuisines-content";
 
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || "https://www.poulzz.store";
 
@@ -56,6 +57,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ];
 
+  // Cuisine landing pages (contenu éditorial statique, ensemble fermé)
+  const cuisinePages: MetadataRoute.Sitemap = CUISINES_CONTENT.map((cuisine) => ({
+    url: `${BASE_URL}/restaurants/cuisine/${cuisine.slug}`,
+    lastModified: now,
+    changeFrequency: "weekly" as const,
+    priority: 0.8,
+  }));
+
   // Vendor pages (restaurants and stores)
   const vendorPages: MetadataRoute.Sitemap =
     vendors
@@ -79,5 +88,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.7,
     })) || [];
 
-  return [...staticPages, ...vendorPages, ...groceryPages];
+  return [...staticPages, ...cuisinePages, ...vendorPages, ...groceryPages];
 }
