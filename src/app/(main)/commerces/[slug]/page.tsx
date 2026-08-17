@@ -160,6 +160,13 @@ async function CommerceContent({ slug }: { slug: string }) {
 export default async function CommerceDetailPage({ params }: Props) {
   const { slug } = await params;
 
+  // Le 404 doit être décidé AVANT le <Suspense> : en streaming SSR les headers
+  // partent avec le shell, donc un notFound() sous Suspense renvoie un 200 (soft-404).
+  const vendor = await getVendor(slug);
+  if (!vendor) {
+    notFound();
+  }
+
   return (
     <Suspense
       fallback={

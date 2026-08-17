@@ -124,10 +124,13 @@ export async function getVendor(slugOrId: string): Promise<Vendor | null> {
     const supabase = await createServerClient();
 
     // Try to find by slug first, then by ID
+    // is_active : un vendeur désactivé doit renvoyer un vrai 404, pas un 200
+    // (il est déjà exclu du sitemap, une page servie en 200 serait orpheline).
     let { data, error } = await supabase
       .from('vendors')
       .select('*')
       .eq('slug', slugOrId)
+      .eq('is_active', true)
       .single();
 
     if (error || !data) {
@@ -136,6 +139,7 @@ export async function getVendor(slugOrId: string): Promise<Vendor | null> {
         .from('vendors')
         .select('*')
         .eq('id', slugOrId)
+        .eq('is_active', true)
         .single();
 
       data = result.data;
@@ -233,10 +237,14 @@ export async function getVendorProducts(
 export async function getProduct(productId: string): Promise<Product | null> {
   try {
     const supabase = await createServerClient();
+    // Mêmes filtres que getVendorProducts : un produit dépublié ne doit pas rester
+    // accessible en 200 via son URL directe alors qu'il a disparu de la grille vendeur.
     const { data, error } = await supabase
       .from('products')
       .select('*, vendor:vendors(id, name, logo_url, delivery_fee, min_order)')
       .eq('id', productId)
+      .eq('is_active', true)
+      .eq('is_published', true)
       .single();
 
     if (error) {

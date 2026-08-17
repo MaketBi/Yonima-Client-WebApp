@@ -60,6 +60,14 @@ export function EstablishmentHeaderMobile({ establishment }: EstablishmentHeader
           </p>
         </div>
       </div>
+
+      {/* Description du vendeur : seul texte unique par fiche, indispensable au SEO.
+          Elle n'était utilisée que dans la meta description, jamais rendue dans le DOM. */}
+      {establishment.description && (
+        <p className="px-4 pb-3 text-sm text-muted-foreground">
+          {establishment.description}
+        </p>
+      )}
     </div>
   );
 }

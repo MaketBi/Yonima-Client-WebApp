@@ -1,4 +1,4 @@
-import { APP_NAME, COMPANY } from "@/lib/constants";
+import { APP_NAME, COMPANY, IOS_APP_URL, ANDROID_APP_URL } from "@/lib/constants";
 import type { Vendor, Product } from "@/types/models";
 
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || "https://www.poulzz.store";
@@ -46,6 +46,9 @@ export function OrganizationJsonLd() {
       name: "Dakar",
       "@id": "https://www.wikidata.org/wiki/Q3718",
     },
+    // Rattache les applications mobiles à l'entité : aide les moteurs à consolider
+    // la marque plutôt qu'à la fragmenter entre plusieurs profils.
+    sameAs: [IOS_APP_URL, ANDROID_APP_URL].filter(Boolean),
   };
 
   return <JsonLd data={data} />;
@@ -74,14 +77,14 @@ export function WebSiteJsonLd() {
 
 // Restaurant schema for vendor pages
 export function RestaurantJsonLd({ vendor }: { vendor: Vendor }) {
-  const vendorUrl =
-    vendor.type === "restaurant"
-      ? `${BASE_URL}/restaurants/${vendor.slug}`
-      : `${BASE_URL}/commerces/${vendor.slug}`;
+  const isRestaurant = vendor.type === "restaurant";
+  const vendorUrl = isRestaurant
+    ? `${BASE_URL}/restaurants/${vendor.slug}`
+    : `${BASE_URL}/commerces/${vendor.slug}`;
 
   const data = {
     "@context": "https://schema.org",
-    "@type": vendor.type === "restaurant" ? "Restaurant" : "Store",
+    "@type": isRestaurant ? "Restaurant" : "Store",
     "@id": vendorUrl,
     name: vendor.name,
     description: vendor.description || `Commandez chez ${vendor.name} sur ${APP_NAME}`,
@@ -100,8 +103,9 @@ export function RestaurantJsonLd({ vendor }: { vendor: Vendor }) {
       longitude: vendor.longitude,
     } : undefined,
     telephone: vendor.phone || undefined,
-    priceRange: "$$",
-    servesCuisine: vendor.tags?.length ? vendor.tags[0] : undefined,
+    // servesCuisine n'existe que sur FoodEstablishment : invalide sur un Store
+    // (un cybercafé publiait `servesCuisine: "Cyber"`).
+    servesCuisine: isRestaurant && vendor.tags?.length ? vendor.tags[0] : undefined,
     aggregateRating: vendor.rating && vendor.review_count ? {
       "@type": "AggregateRating",
       ratingValue: vendor.rating,
@@ -114,7 +118,8 @@ export function RestaurantJsonLd({ vendor }: { vendor: Vendor }) {
       : undefined,
     deliveryCharge: {
       "@type": "MonetaryAmount",
-      value: vendor.delivery_fee || 1000,
+      // `??` et non `||` : avec `||`, une livraison gratuite (0) publiait 1000 XOF.
+      value: vendor.delivery_fee ?? 1000,
       currency: "XOF",
     },
     potentialAction: {
