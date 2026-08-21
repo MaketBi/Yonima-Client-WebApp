@@ -2,6 +2,7 @@ import { MetadataRoute } from "next";
 import { createServerClient } from "@/lib/supabase/server";
 import { getGroceryCategories } from "@/actions/catalog";
 import { CUISINES_CONTENT } from "@/lib/cuisines-content";
+import { ROUTES } from "@/lib/constants";
 
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || "https://www.poulzz.store";
 
@@ -54,6 +55,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: now,
       changeFrequency: "monthly",
       priority: 0.5,
+    },
+    {
+      // Page de référence sur le fonctionnement du service : contenu stable,
+      // pensé pour être cité par les moteurs génératifs.
+      url: `${BASE_URL}${ROUTES.livraisonDakar}`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.8,
     },
   ];
 

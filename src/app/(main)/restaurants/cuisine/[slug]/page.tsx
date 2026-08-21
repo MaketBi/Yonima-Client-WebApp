@@ -7,7 +7,7 @@ import { EstablishmentList } from '@/components/establishment/establishment-list
 import { BreadcrumbJsonLd, ItemListJsonLd } from '@/components/seo';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CUISINES_CONTENT, getCuisineContent } from '@/lib/cuisines-content';
-import { cuisineEmoji } from '@/lib/constants';
+import { cuisineEmoji, ROUTES } from '@/lib/constants';
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -141,6 +141,11 @@ export default async function CuisinePage({ params }: Props) {
           {cuisine.body.map((paragraph, i) => (
             <p key={i}>{paragraph}</p>
           ))}
+          <p>
+            <Link href={ROUTES.livraisonDakar} className="text-primary hover:underline">
+              Délais, tarifs et moyens de paiement : comment fonctionne la livraison à Dakar
+            </Link>
+          </p>
         </div>
       </section>
 

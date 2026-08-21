@@ -40,6 +40,11 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href={ROUTES.livraisonDakar} className="hover:text-primary transition-colors">
+                  Livraison à Dakar
+                </Link>
+              </li>
+              <li>
                 <Link href={ROUTES.apropos} className="hover:text-primary transition-colors">
                   À propos
                 </Link>

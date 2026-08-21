@@ -175,6 +175,7 @@ export const ROUTES = {
   fidelite: '/fidelite',
   notifications: '/notifications',
   apropos: '/apropos', // page locale à la webapp client (≠ poulzz.com/about, autre sujet)
+  livraisonDakar: '/livraison-dakar', // page de référence « comment ça marche »
 } as const;
 
 // Pages légales & informationnelles : elles vivent sur le site vitrine
