@@ -20,7 +20,7 @@ export const COMPANY = {
   capital: '100 000 F CFA',
   email: 'contact@poulzz.com',
   phone: '+221 76 295 70 97',
-  whatsapp: '+221 76 295 70 97',
+  whatsapp: '+221 77 743 35 16',
   address: 'Bene Baraque, Ainoumady 2, Dakar 11000, Sénégal',
   city: 'Dakar',
   country: 'Sénégal',
