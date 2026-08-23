@@ -176,6 +176,8 @@ export const ROUTES = {
   notifications: '/notifications',
   apropos: '/apropos', // page locale à la webapp client (≠ poulzz.com/about, autre sujet)
   livraisonDakar: '/livraison-dakar', // page de référence « comment ça marche »
+  app: '/app', // page « link in bio » pour Instagram / TikTok / Facebook
+  download: '/dl', // redirection directe vers le store selon l'appareil
 } as const;
 
 // Pages légales & informationnelles : elles vivent sur le site vitrine
@@ -189,6 +191,16 @@ export const LEGAL_URLS = {
   support: 'https://www.poulzz.com/support',
   getApp: 'https://www.poulzz.com/get',
   home: 'https://www.poulzz.com/',
+} as const;
+
+// Comptes sociaux, affichés sur la page /app (« link in bio »).
+// Une entrée laissée vide n'affiche simplement pas son bouton : renseigner
+// l'URL complète du profil suffit à le faire apparaître.
+// TODO : renseigner les trois URLs.
+export const SOCIAL_LINKS = {
+  instagram: '',
+  tiktok: '',
+  facebook: '',
 } as const;
 
 // API endpoints (Edge Functions)
