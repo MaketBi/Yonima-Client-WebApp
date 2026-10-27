@@ -25,7 +25,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return { title: 'Cuisine introuvable' };
   }
 
+  // Une page cuisine sans restaurant n'a que sa prose à offrir : indexée, elle
+  // se lit comme du contenu mince et tire le reste du site vers le bas. Tant
+  // que le catalogue ne porte aucun vendeur pour ce tag, on la sert en
+  // noindex — elle redevient indexable d'elle-même une fois les vendeurs
+  // tagués, sans redéploiement.
+  const sample = await getVendorsByType('restaurant', { cuisine: cuisine.tag, limit: 1 });
+
   return {
+    ...(sample.length === 0 && { robots: { index: false, follow: true } }),
     // Le layout applique déjà le template `%s | Yonima` — ne pas le dupliquer ici.
     title: cuisine.title,
     description: cuisine.description,

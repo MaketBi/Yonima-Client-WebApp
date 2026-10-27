@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { BreadcrumbJsonLd, FAQJsonLd } from '@/components/seo';
 import { LIVRAISON_FAQ, LIVRAISON_INTRO } from '@/lib/livraison-content';
 import { CUISINES_CONTENT } from '@/lib/cuisines-content';
+import { QUARTIERS_CONTENT } from '@/lib/quartiers-content';
 import { APP_NAME, ROUTES, cuisineEmoji } from '@/lib/constants';
 
 export const metadata: Metadata = {
@@ -72,6 +73,28 @@ export default function LivraisonDakarPage() {
           </section>
         ))}
       </div>
+
+      {/* Entrée vers les pages quartier : sans ce lien depuis le hub, elles
+          seraient orphelines et ne dépendraient que du sitemap pour exister. */}
+      <section className="mt-12">
+        <h2 className="text-xl font-semibold mb-3">La livraison quartier par quartier</h2>
+        <p className="text-muted-foreground leading-relaxed mb-4">
+          Les adresses disponibles et les habitudes de commande changent d&apos;un quartier à
+          l&apos;autre. Voici le détail là où {APP_NAME} est le plus présent.
+        </p>
+        <ul className="flex flex-wrap gap-2">
+          {QUARTIERS_CONTENT.map((quartier) => (
+            <li key={quartier.slug}>
+              <Link
+                href={`${ROUTES.livraisonDakar}/${quartier.slug}`}
+                className="inline-flex items-center rounded-full border px-3 py-1.5 text-sm hover:bg-muted transition-colors"
+              >
+                {quartier.label}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
 
       <section className="mt-12">
         <h2 className="text-xl font-semibold mb-3">Commander à Dakar</h2>

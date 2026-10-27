@@ -24,6 +24,8 @@ export async function getVendorsByType(
     search?: string;
     /** Filter to vendors carrying this cuisine tag (matched against vendors.tags). */
     cuisine?: string;
+    /** Filter to vendors located in this neighborhood (exact match on vendors.neighborhood). */
+    neighborhood?: string;
   }
 ): Promise<Vendor[]> {
   try {
@@ -43,6 +45,13 @@ export async function getVendorsByType(
     if (options?.cuisine) {
       // vendors.tags is a text[]; `contains` matches rows whose array includes the tag.
       query = query.contains('tags', [options.cuisine]);
+    }
+
+    if (options?.neighborhood) {
+      // vendors.neighborhood est saisi en back-office : la casse et les accents
+      // varient. `ilike` sans joker compare la valeur entière, insensible à la
+      // casse, là où `eq` laisserait passer « Camberene » à côté de « Cambérène ».
+      query = query.ilike('neighborhood', options.neighborhood);
     }
 
     if (options?.search) {
