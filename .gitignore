@@ -43,3 +43,6 @@ next-env.d.ts
 
 # Réglages locaux Claude Code (propres à la machine)
 /.claude/
+
+# Cache Python des scripts (scripts/keywords_dakar.py)
+scripts/__pycache__/

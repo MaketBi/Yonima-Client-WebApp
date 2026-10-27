@@ -9,5 +9,15 @@
         "C3:F8:E9:5C:96:13:90:EA:7C:F5:9B:9C:F7:F2:65:62:9C:C2:76:0E:FE:A0:3C:F5:54:4E:F6:FE:6F:61:58:6C"
       ]
     }
+  },
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.yonima.business",
+      "sha256_cert_fingerprints": [
+        "C3:F8:E9:5C:96:13:90:EA:7C:F5:9B:9C:F7:F2:65:62:9C:C2:76:0E:FE:A0:3C:F5:54:4E:F6:FE:6F:61:58:6C"
+      ]
+    }
   }
 ]
